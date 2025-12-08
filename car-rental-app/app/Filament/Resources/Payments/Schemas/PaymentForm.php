@@ -14,26 +14,41 @@ class PaymentForm
     {
         return $schema
             ->components([
-                TextInput::make('payable_type')
-                    ->required(),
-                TextInput::make('payable_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
-                Select::make('method')
-                    ->options(PaymentMethod::class)
-                    ->required(),
-                Select::make('status')
-                    ->options(PaymentStatus::class)
-                    ->default('pending')
-                    ->required(),
-                TextInput::make('transaction_reference')
-                    ->default(null),
-                TextInput::make('proof_url')
-                    ->url()
-                    ->default(null),
+                \Filament\Forms\Components\Section::make('Payment Details')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('amount')
+                            ->required()
+                            ->numeric()
+                            ->prefix('₦'),
+                        Select::make('method')
+                            ->options(PaymentMethod::class)
+                            ->required(),
+                        Select::make('status')
+                            ->options(PaymentStatus::class)
+                            ->default('pending')
+                            ->required(),
+                        TextInput::make('transaction_reference'),
+                    ]),
+
+                \Filament\Forms\Components\Section::make('Proof of Payment')
+                    ->schema([
+                        \Filament\Forms\Components\FileUpload::make('proof_url')
+                            ->image()
+                            ->directory('payments')
+                            ->openable(),
+                    ]),
+
+                \Filament\Forms\Components\Section::make('Linked Entity')
+                    ->description('Read-only. This payment is linked to the entity below.')
+                    ->schema([
+                        TextInput::make('payable_type')
+                            ->disabled()
+                            ->dehydrated(false),
+                        TextInput::make('payable_id')
+                            ->disabled()
+                            ->dehydrated(false),
+                    ]),
             ]);
     }
 }

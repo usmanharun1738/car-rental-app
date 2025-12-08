@@ -14,13 +14,8 @@ class PaymentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('payable_type')
-                    ->searchable(),
-                TextColumn::make('payable_id')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('amount')
-                    ->numeric()
+                    ->money('NGN')
                     ->sortable(),
                 TextColumn::make('method')
                     ->badge()
@@ -29,9 +24,14 @@ class PaymentsTable
                     ->badge()
                     ->searchable(),
                 TextColumn::make('transaction_reference')
-                    ->searchable(),
-                TextColumn::make('proof_url')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('payable_type')
+                    ->label('Type')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('payable_id')
+                    ->label('Entity ID')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
