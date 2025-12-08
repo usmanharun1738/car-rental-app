@@ -6,7 +6,17 @@ use Livewire\Volt\Volt;
 
 Volt::route('/', 'pages.home')->name('home');
 
-Route::view('dashboard', 'dashboard')
+// Vehicle Details
+Volt::route('/vehicles/{vehicle}', 'pages.vehicles.show')->name('vehicles.show');
+
+// Booking (requires auth)
+Route::middleware(['auth'])->group(function () {
+    Volt::route('/booking/create', 'pages.booking.create')->name('booking.create');
+    Volt::route('/booking/{booking}/payment', 'pages.booking.payment')->name('booking.payment');
+});
+
+// Customer Dashboard
+Volt::route('dashboard', 'pages.dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 

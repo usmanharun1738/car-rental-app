@@ -165,7 +165,7 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                                         <span class="text-2xl font-bold text-[#1E3A5F]">₦{{ number_format($vehicle->daily_rate) }}</span>
                                         <span class="text-sm text-gray-500">/day</span>
                                     </div>
-                                    <a href="/vehicles/{{ $vehicle->id }}" 
+                                    <a href="{{ route('vehicles.show', $vehicle) }}" 
                                        class="px-4 py-2 bg-[#1E3A5F] text-white text-sm font-medium rounded-lg hover:bg-[#152a45] transition"
                                        wire:navigate>
                                         Book Now
