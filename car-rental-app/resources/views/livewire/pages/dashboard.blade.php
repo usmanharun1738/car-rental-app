@@ -89,6 +89,18 @@ new #[Layout('components.layouts.guest')] #[Title('My Bookings - CARTAR')] class
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session('info'))
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+                {{ session('info') }}
+            </div>
+        @endif
+
         <!-- Bookings List -->
         @if($this->bookings->isEmpty())
             <div class="bg-white rounded-2xl shadow-md p-12 text-center">

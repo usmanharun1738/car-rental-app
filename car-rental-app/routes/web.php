@@ -3,8 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\PaymentCallbackController;
+use App\Http\Controllers\PaystackWebhookController;
 
 Volt::route('/', 'pages.home')->name('home');
+
+// Payment callback (no auth required - Paystack redirects here)
+Route::get('/payment/callback', [PaymentCallbackController::class, 'handle'])->name('payment.callback');
+
+// Paystack webhook (no auth, no CSRF - server-to-server)
+Route::post('/webhook/paystack', [PaystackWebhookController::class, 'handle'])->name('webhook.paystack');
 
 // Vehicle Details
 Volt::route('/vehicles/{vehicle}', 'pages.vehicles.show')->name('vehicles.show');

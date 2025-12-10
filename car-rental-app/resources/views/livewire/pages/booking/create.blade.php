@@ -329,6 +329,15 @@ new #[Layout('components.layouts.guest')] #[Title('Complete Your Booking - CARTA
                 @endif
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    @if($booking && $booking->status->value === 'pending')
+                        <a href="{{ route('booking.payment', $booking) }}" 
+                           class="px-6 py-3 bg-[#FF6B35] text-white font-semibold rounded-lg hover:bg-[#e55a2b] transition flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                            Proceed to Payment
+                        </a>
+                    @endif
                     <a href="{{ route('dashboard') }}" 
                        class="px-6 py-3 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#152a45] transition"
                        wire:navigate>

@@ -11,7 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Exclude Paystack webhook from CSRF verification
+        // This is required because Paystack sends server-to-server POST requests
+        $middleware->validateCsrfTokens(except: [
+            'webhook/paystack',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
