@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\PaymentAuditLog;
 use App\Enums\PaymentStatus;
 use App\Enums\BookingStatus;
 use App\Services\PaystackService;
@@ -33,6 +34,14 @@ class PaystackWebhookController extends Controller
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
+
+            // Audit log: Invalid signature attempt
+            PaymentAuditLog::log(
+                event: PaymentAuditLog::EVENT_INVALID_SIGNATURE,
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                metadata: ['signature_present' => !empty($signature)]
+            );
             
             return response()->json(['error' => 'Invalid signature'], 401);
         }
@@ -45,9 +54,20 @@ class PaystackWebhookController extends Controller
             return response()->json(['error' => 'Invalid payload'], 400);
         }
 
+        $reference = $event['data']['reference'] ?? null;
+
+        // Audit log: Webhook received
+        PaymentAuditLog::log(
+            event: PaymentAuditLog::EVENT_WEBHOOK_RECEIVED,
+            reference: $reference,
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent(),
+            metadata: ['event_type' => $event['event'] ?? 'unknown']
+        );
+
         Log::info('Paystack webhook received', [
             'event' => $event['event'] ?? 'unknown',
-            'reference' => $event['data']['reference'] ?? null,
+            'reference' => $reference,
         ]);
 
         // Handle the event
@@ -55,7 +75,7 @@ class PaystackWebhookController extends Controller
 
         switch ($eventType) {
             case 'charge.success':
-                return $this->handleChargeSuccess($event['data']);
+                return $this->handleChargeSuccess($event['data'], $request);
             
             default:
                 // Acknowledge receipt of unhandled events
@@ -67,7 +87,7 @@ class PaystackWebhookController extends Controller
     /**
      * Handle successful charge event
      */
-    private function handleChargeSuccess(array $data): \Illuminate\Http\JsonResponse
+    private function handleChargeSuccess(array $data, Request $request): \Illuminate\Http\JsonResponse
     {
         $reference = $data['reference'] ?? null;
         $paidAmount = $data['amount'] ?? 0; // Amount in kobo
@@ -101,6 +121,18 @@ class PaystackWebhookController extends Controller
                 'expected_kobo' => $payment->amount * 100,
                 'received_kobo' => $paidAmount,
             ]);
+
+            // Audit log: Amount mismatch
+            PaymentAuditLog::log(
+                event: PaymentAuditLog::EVENT_AMOUNT_MISMATCH,
+                paymentId: $payment->id,
+                reference: $reference,
+                ipAddress: $request->ip(),
+                metadata: [
+                    'expected_kobo' => $payment->amount * 100,
+                    'received_kobo' => $paidAmount,
+                ]
+            );
             
             // Still mark as failed to prevent retries with wrong amount
             $payment->update(['status' => PaymentStatus::FAILED]);
@@ -120,6 +152,18 @@ class PaystackWebhookController extends Controller
                 'status' => BookingStatus::CONFIRMED,
             ]);
 
+            // Audit log: Payment verified
+            PaymentAuditLog::log(
+                event: PaymentAuditLog::EVENT_VERIFIED,
+                paymentId: $payment->id,
+                reference: $reference,
+                ipAddress: $request->ip(),
+                metadata: [
+                    'booking_id' => $booking->id,
+                    'amount_kobo' => $paidAmount,
+                ]
+            );
+
             Log::info('Paystack webhook: Payment confirmed', [
                 'reference' => $reference,
                 'payment_id' => $payment->id,
@@ -130,3 +174,4 @@ class PaystackWebhookController extends Controller
         return response()->json(['message' => 'Payment confirmed'], 200);
     }
 }
+

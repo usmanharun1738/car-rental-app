@@ -59,7 +59,11 @@ new #[Layout('components.layouts.guest')] #[Title('Complete Payment - CARTAR')] 
         $this->errorMessage = null;
 
         try {
-            $result = app(ProcessPaymentAction::class)->execute($this->booking);
+            $result = app(ProcessPaymentAction::class)->execute(
+                $this->booking,
+                request()->ip(),
+                request()->userAgent()
+            );
             
             // Redirect to Paystack
             $this->redirect($result['authorization_url']);
