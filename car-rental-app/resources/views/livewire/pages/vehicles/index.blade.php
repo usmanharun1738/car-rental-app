@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\VehicleStatus;
+use App\Enums\FuelType;
+use App\Enums\TransmissionType;
 use App\Models\Vehicle;
 use Livewire\Volt\Component;
 use Livewire\Attributes\{Layout, Title, Url};
@@ -14,9 +16,6 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
     public string $search = '';
 
     #[Url]
-    public string $location = '';
-
-    #[Url]
     public int $minPrice = 0;
 
     #[Url]
@@ -26,22 +25,43 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
     public string $sortBy = 'recommended';
 
     #[Url]
-    public array $vehicleTypes = [];
+    public array $transmissions = [];
 
     #[Url]
-    public array $specifications = [];
+    public array $fuelTypes = [];
+
+    #[Url]
+    public ?int $minSeats = null;
+
+    #[Url]
+    public string $location = '';
 
     public function updatedSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatedVehicleTypes(): void
+    public function updatedTransmissions(): void
     {
         $this->resetPage();
     }
 
-    public function updatedSpecifications(): void
+    public function updatedFuelTypes(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMinSeats(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedLocation(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMaxPrice(): void
     {
         $this->resetPage();
     }
@@ -51,8 +71,10 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
         $this->search = '';
         $this->minPrice = 0;
         $this->maxPrice = 500000;
-        $this->vehicleTypes = [];
-        $this->specifications = [];
+        $this->transmissions = [];
+        $this->fuelTypes = [];
+        $this->minSeats = null;
+        $this->location = '';
         $this->sortBy = 'recommended';
         $this->resetPage();
     }
@@ -60,6 +82,7 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
     public function with(): array
     {
         $query = Vehicle::query()
+            ->with('images')
             ->where('status', VehicleStatus::AVAILABLE)
             ->when($this->search, fn ($q) => 
                 $q->where(fn ($subQ) => 
@@ -67,23 +90,47 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
                           ->orWhere('model', 'like', "%{$this->search}%")
                 )
             )
-            ->when($this->minPrice > 0, fn ($q) => 
-                $q->where('daily_rate', '>=', $this->minPrice)
+            // Price filter - always apply both min and max
+            ->where('daily_rate', '>=', $this->minPrice)
+            ->where('daily_rate', '<=', $this->maxPrice)
+            // Filter by transmission types
+            ->when(!empty($this->transmissions), fn ($q) => 
+                $q->whereIn('transmission', $this->transmissions)
             )
-            ->when($this->maxPrice < 500000, fn ($q) => 
-                $q->where('daily_rate', '<=', $this->maxPrice)
+            // Filter by fuel types
+            ->when(!empty($this->fuelTypes), fn ($q) => 
+                $q->whereIn('fuel_type', $this->fuelTypes)
+            )
+            // Filter by minimum seats
+            ->when($this->minSeats, fn ($q) => 
+                $q->where('seats', '>=', $this->minSeats)
+            )
+            // Filter by location
+            ->when($this->location, fn ($q) => 
+                $q->where('location', $this->location)
             );
 
         // Apply sorting
         $query = match($this->sortBy) {
             'price_low' => $query->orderBy('daily_rate', 'asc'),
             'price_high' => $query->orderBy('daily_rate', 'desc'),
+            'newest' => $query->orderBy('year', 'desc'),
             default => $query->latest(),
         };
 
+        // Get unique locations for filter
+        $locations = Vehicle::where('status', VehicleStatus::AVAILABLE)
+            ->distinct()
+            ->pluck('location')
+            ->sort()
+            ->values();
+
         return [
-            'vehicles' => $query->paginate(9),
+            'vehicles' => $query->paginate(12),
             'totalCount' => Vehicle::where('status', VehicleStatus::AVAILABLE)->count(),
+            'transmissionOptions' => TransmissionType::cases(),
+            'fuelTypeOptions' => FuelType::cases(),
+            'locationOptions' => $locations,
         ];
     }
 }; ?>
@@ -151,6 +198,22 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
                 </div>
                 <hr class="border-gray-100 mb-6">
 
+                <!-- Location -->
+                <div class="mb-8">
+                    <h3 class="text-gray-900 text-base font-bold mb-4">Location</h3>
+                    <select 
+                        wire:model.live="location"
+                        class="w-full border border-gray-200 rounded-lg p-2.5 text-gray-700 bg-gray-50 focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+                    >
+                        <option value="">All Locations</option>
+                        @foreach($locationOptions as $loc)
+                            <option value="{{ $loc }}">{{ $loc }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <hr class="border-gray-100 mb-6">
+
                 <!-- Price Range -->
                 <div class="mb-8">
                     <h3 class="text-gray-900 text-base font-bold mb-4">Price Range (per day)</h3>
@@ -178,19 +241,19 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
 
                 <hr class="border-gray-100 mb-6">
 
-                <!-- Car Type -->
+                <!-- Transmission -->
                 <div class="mb-8">
-                    <h3 class="text-gray-900 text-base font-bold mb-4">Car Type</h3>
+                    <h3 class="text-gray-900 text-base font-bold mb-4">Transmission</h3>
                     <div class="flex flex-col gap-2">
-                        @foreach(['SUV', 'Sedan', 'Hatchback', 'Luxury', 'Convertible'] as $type)
+                        @foreach($transmissionOptions as $transmission)
                             <label class="flex items-center gap-3 py-1 cursor-pointer group">
                                 <input 
                                     type="checkbox" 
-                                    wire:model.live="vehicleTypes"
-                                    value="{{ strtolower($type) }}"
+                                    wire:model.live="transmissions"
+                                    value="{{ $transmission->value }}"
                                     class="h-5 w-5 rounded border-gray-300 bg-transparent text-[#FF6B35] focus:ring-[#FF6B35] focus:ring-offset-0 transition"
                                 >
-                                <span class="text-gray-700 text-base font-normal group-hover:text-[#FF6B35] transition-colors">{{ $type }}</span>
+                                <span class="text-gray-700 text-base font-normal group-hover:text-[#FF6B35] transition-colors">{{ $transmission->label() }}</span>
                             </label>
                         @endforeach
                     </div>
@@ -198,22 +261,41 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
 
                 <hr class="border-gray-100 mb-6">
 
-                <!-- Specifications -->
-                <div class="mb-4">
-                    <h3 class="text-gray-900 text-base font-bold mb-4">Specifications</h3>
+                <!-- Fuel Type -->
+                <div class="mb-8">
+                    <h3 class="text-gray-900 text-base font-bold mb-4">Fuel Type</h3>
                     <div class="flex flex-col gap-2">
-                        @foreach(['Automatic', 'Manual', 'Air Conditioning', 'Electric / Hybrid'] as $spec)
+                        @foreach($fuelTypeOptions as $fuelType)
                             <label class="flex items-center gap-3 py-1 cursor-pointer group">
                                 <input 
                                     type="checkbox" 
-                                    wire:model.live="specifications"
-                                    value="{{ strtolower($spec) }}"
+                                    wire:model.live="fuelTypes"
+                                    value="{{ $fuelType->value }}"
                                     class="h-5 w-5 rounded border-gray-300 bg-transparent text-[#FF6B35] focus:ring-[#FF6B35] focus:ring-offset-0 transition"
                                 >
-                                <span class="text-gray-700 text-base font-normal group-hover:text-[#FF6B35] transition-colors">{{ $spec }}</span>
+                                <span class="flex items-center gap-2 text-gray-700 text-base font-normal group-hover:text-[#FF6B35] transition-colors">
+                                    <span class="material-symbols-outlined text-sm">{{ $fuelType->icon() }}</span>
+                                    {{ $fuelType->label() }}
+                                </span>
                             </label>
                         @endforeach
                     </div>
+                </div>
+
+                <hr class="border-gray-100 mb-6">
+
+                <!-- Minimum Seats -->
+                <div class="mb-4">
+                    <h3 class="text-gray-900 text-base font-bold mb-4">Minimum Seats</h3>
+                    <select 
+                        wire:model.live="minSeats"
+                        class="w-full border border-gray-200 rounded-lg p-2 text-gray-700 bg-gray-50 focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+                    >
+                        <option value="">Any</option>
+                        <option value="4">4+ seats</option>
+                        <option value="5">5+ seats</option>
+                        <option value="7">7+ seats</option>
+                    </select>
                 </div>
             </aside>
 

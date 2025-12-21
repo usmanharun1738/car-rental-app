@@ -24,6 +24,7 @@ class Vehicle extends Model
         'transmission',
         'seats',
         'mileage',
+        'location',
     ];
 
     protected $casts = [

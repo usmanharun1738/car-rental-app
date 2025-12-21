@@ -14,6 +14,7 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
     {
         return [
             'vehicles' => Vehicle::query()
+                ->with('images') // eager load for performance
                 ->where('status', VehicleStatus::AVAILABLE)
                 ->when($this->search, fn ($query) => 
                     $query->where(fn ($q) => 
@@ -22,7 +23,7 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                     )
                 )
                 ->latest()
-                ->take(4)
+                ->take(15)
                 ->get(),
         ];
     }
