@@ -14,6 +14,9 @@ Route::get('/payment/callback', [PaymentCallbackController::class, 'handle'])->n
 // Paystack webhook (no auth, no CSRF - server-to-server)
 Route::post('/webhook/paystack', [PaystackWebhookController::class, 'handle'])->name('webhook.paystack');
 
+// Vehicle Listing
+Volt::route('/vehicles', 'pages.vehicles.index')->name('vehicles.index');
+
 // Vehicle Details
 Volt::route('/vehicles/{vehicle}', 'pages.vehicles.show')->name('vehicles.show');
 
