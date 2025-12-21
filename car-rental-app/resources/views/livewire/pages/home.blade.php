@@ -171,7 +171,7 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                             <!-- Vehicle Info -->
                             <div class="flex flex-col gap-1">
                                 <h3 class="text-gray-900 text-lg font-bold">{{ $vehicle->make }} {{ $vehicle->model }}</h3>
-                                <p class="text-gray-500 text-sm">{{ $vehicle->transmission ?? 'Automatic' }} • {{ $vehicle->seats ?? 5 }} Seats</p>
+                                <p class="text-gray-500 text-sm">{{ $vehicle->transmission?->shortLabel() ?? 'Auto' }} • {{ $vehicle->seats ?? 5 }} Seats</p>
                             </div>
                             
                             <!-- Price & CTA -->

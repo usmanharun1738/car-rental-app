@@ -313,15 +313,15 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
                                         </div>
                                         <div class="flex items-center gap-2 text-sm text-gray-600">
                                             <span class="material-symbols-outlined text-lg text-gray-400">settings</span>
-                                            <span>{{ $vehicle->transmission ?? 'Automatic' }}</span>
+                                            <span>{{ $vehicle->transmission?->shortLabel() ?? 'Auto' }}</span>
                                         </div>
                                         <div class="flex items-center gap-2 text-sm text-gray-600">
-                                            <span class="material-symbols-outlined text-lg text-gray-400">work</span>
-                                            <span>2 Bags</span>
+                                            <span class="material-symbols-outlined text-lg text-gray-400">{{ $vehicle->fuel_type?->icon() ?? 'local_gas_station' }}</span>
+                                            <span>{{ $vehicle->fuel_type?->label() ?? 'Petrol' }}</span>
                                         </div>
                                         <div class="flex items-center gap-2 text-sm text-gray-600">
-                                            <span class="material-symbols-outlined text-lg text-gray-400">ac_unit</span>
-                                            <span>AC</span>
+                                            <span class="material-symbols-outlined text-lg text-gray-400">speed</span>
+                                            <span>{{ $vehicle->mileage == 0 || !$vehicle->mileage ? 'Unlimited' : $vehicle->mileage . 'km' }}</span>
                                         </div>
                                     </div>
 

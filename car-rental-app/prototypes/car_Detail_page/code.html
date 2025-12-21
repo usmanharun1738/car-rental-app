@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Car Details - CARTAR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9CBF9B","secondary": "#CFD186","accent": "#E3655B","background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display overflow-x-hidden antialiased">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e5e7eb] dark:border-b-gray-800 bg-white dark:bg-[#111418] px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#111418] dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-3xl">directions_car</span>
+</div>
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">CARTAR</h2>
+</div>
+<div class="hidden lg:flex items-center gap-9">
+<a class="text-[#111418] dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Cars</a>
+<a class="text-[#111418] dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Locations</a>
+<a class="text-[#111418] dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Deals</a>
+<a class="text-[#111418] dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Manage Booking</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-[#d1d5db] dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden focus-within:border-primary">
+<div class="text-[#617589] flex items-center justify-center pl-4 pr-2">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-[#617589] px-2 text-sm font-normal leading-normal" placeholder="Search cars..." value=""/>
+</div>
+</label>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-accent hover:bg-[#c9544b] transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Sign In</span>
+</button>
+</div>
+</header>
+<div class="layout-container flex flex-col items-center w-full pb-20">
+<div class="w-full max-w-[1200px] px-4 md:px-8">
+<div class="flex flex-wrap gap-2 py-6 items-center">
+<a class="text-[#617589] hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-[#617589] text-sm">chevron_right</span>
+<a class="text-[#617589] hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Luxury Cars</a>
+<span class="material-symbols-outlined text-[#617589] text-sm">chevron_right</span>
+<span class="text-[#111418] dark:text-white text-sm font-medium leading-normal">Mercedes-Benz C-Class</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+<div>
+<h1 class="text-[#111418] dark:text-white tracking-tight text-3xl md:text-4xl font-bold leading-tight mb-2">Mercedes-Benz C-Class</h1>
+<div class="flex items-center gap-2">
+<div class="flex text-secondary">
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star</span>
+<span class="material-symbols-outlined text-[20px] fill-current">star_half</span>
+</div>
+<span class="text-[#111418] dark:text-gray-300 text-sm font-medium">4.8 (124 reviews)</span>
+<span class="text-gray-400 text-sm">•</span>
+<span class="text-[#617589] dark:text-gray-400 text-sm">Luxury Sedan</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-primary text-[20px]">share</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">Share</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-primary text-[20px]">favorite_border</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">Save</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 flex flex-col gap-8">
+<div class="flex flex-col gap-4">
+<div class="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 relative group">
+<img alt="Side profile of a silver Mercedes Benz C-Class parked on asphalt" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" data-alt="Side profile of a silver Mercedes Benz C-Class parked on asphalt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0QgSLzL9aBA6IkdPw-Nt8SjdvmVT56tzQ5uBd4J45dDfB6IiEAYUcICpfvBpYFu8Ljng2nBqC6rHyk5tfDQSvTcEpqh9I_Oi1x_IyRbUtjNJlku4FtTtuLqFqlUu1eFGTpdREw1-EfrISefvDWh0AMCb89tq6hatK9a0y_Ps1iKibfBa6y7vb1ooZGvvvLwN46Q92-NQ_WpRD9uPQFeQXUR0A4THhRgg1gyBENCPVbN-JCCEJWxKbmN4NMLwivCVyabO-RIQjhc6B"/>
+<div class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">photo_library</span>
+                                8 Photos
+                             </div>
+</div>
+<div class="grid grid-cols-4 gap-4">
+<div class="aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer border-2 border-primary">
+<img alt="Interior dashboard view showing steering wheel and infotainment system" class="w-full h-full object-cover" data-alt="Interior dashboard view showing steering wheel and infotainment system" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3SJOW7mcYv6hux84XZ9mwSaPQtZ3nJmFFyt2cRIAtZdAEhxOC7JmCspCCvLlC7n8SxOp34JWjJQM_ePHTSKWzv-slReCCY7Lbxi_mmVKKf_BNjoKU8Y5rAtJFXpA6lCgvRD2qD38bes5x35JmdScTotcxnIxgtXzOpIAAPXanjYTCjVfAT0THg2nT7U5A-nS9xO282ogOnDEJDGx3EzYSiCVpHx3NYUffXftuayHb07JV3f6hWeTjuSXbpJEtLdgnUo-0N7fvOvIe"/>
+</div>
+<div class="aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer opacity-70 hover:opacity-100 transition-opacity">
+<img alt="Close up of car wheel rim and tire" class="w-full h-full object-cover" data-alt="Close up of car wheel rim and tire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtxMTQoU7kuRTp54tw_sKpiungmBTqazrvDhbwxIoBdUKmNQva1KE80C3PSv_2wT_w2F5IqBt8j2nOJxaZPqGgzL0karYCSkoWF9CcI0BReo44S3bEb9O0MNb7Ezgxgcd3v-Iz_OtOq596SvBAfMhM6bmqDjUzEs4aX2RkqMH0ZHJSa0wRaeLVbEbpUqCeEhw9PyR56cvGXFaATuCinyaBKYi5X01r92pQlnGD41mAHVhqttAz7oMUddXhiHTbu6lM_bX6yc_7GCiq"/>
+</div>
+<div class="aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer opacity-70 hover:opacity-100 transition-opacity">
+<img alt="Rear view of car showing tail lights" class="w-full h-full object-cover" data-alt="Rear view of car showing tail lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNV2wmVgcyDyGIKyWpVFybxM3JISJ1KAfQCrGEI5crfPeA9ClNJx_z7G6DoVmUQZ058fILQ9W4JCgCW4XN9L_gt7dZjD_AW4M3PrIEMQS8DT8jpQdXnV2-KmaRbyCzavhh7c7rFaPzf42gULvdHw7YSqcV-8_Ikmq_PubCMGXDe1dFsNHp_bCX9matlBd-hunLSJ0PNZRudv9QM6hgaMDWmZhst3tH55_6OApdSpo9Vp_kdE_UZmiw5xuDaVoTkoc7wsEwHdfO1pau"/>
+</div>
+<div class="aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer opacity-70 hover:opacity-100 transition-opacity relative">
+<img alt="Leather car seats interior view" class="w-full h-full object-cover" data-alt="Leather car seats interior view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhWmcc4scJj1FvHLGi2Gru19T4t8U7rJw-Ghj7c1vHDI_8q7Y60GndiOa1ja5RrLPTuphTM_L8KwVxrCaxPHowZwfqFDrF_g0VwJbc25-09cK6JALge_uXhFKweYw3zesNl-6_vlk_9XiIOJXTG-z-mrnU8f1i1WYuuywEb_4dJs7bY_8O3HcANdAH4d83GZvY5-9ol-kbM3cP0j7QUfvmq_slc3nxYEx2jBO4k_RZrTe7s-WM7MYFXJ7XthQF5ZFqUENjhyFJRFdI"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-sm">
+                                    +4
+                                </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white dark:bg-[#1a202c] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-primary text-[24px] mb-1">local_gas_station</span>
+<span class="text-xs font-bold text-[#617589] uppercase tracking-wide">Fuel Type</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">Premium Gasoline</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-primary text-[24px] mb-1">settings</span>
+<span class="text-xs font-bold text-[#617589] uppercase tracking-wide">Transmission</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">9-Speed Auto</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-primary text-[24px] mb-1">airline_seat_recline_extra</span>
+<span class="text-xs font-bold text-[#617589] uppercase tracking-wide">Seats</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">5 Adults</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="material-symbols-outlined text-primary text-[24px] mb-1">speed</span>
+<span class="text-xs font-bold text-[#617589] uppercase tracking-wide">Mileage</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">Unlimited</span>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<h3 class="text-xl font-bold text-[#111418] dark:text-white">Vehicle Overview</h3>
+<p class="text-base text-[#617589] dark:text-gray-300 leading-relaxed">
+                            Experience the epitome of luxury and performance with the Mercedes-Benz C-Class. 
+                            This sedan offers a smooth, quiet ride with a powerful turbocharged engine that delivers whenever you need it. 
+                            The interior is crafted with high-quality materials, featuring advanced technology to keep you connected and safe on the road. 
+                            Perfect for business trips or a weekend getaway in style.
+                        </p>
+<div class="mt-4">
+<h4 class="text-lg font-bold text-[#111418] dark:text-white mb-4">Key Features</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">Apple CarPlay &amp; Android Auto</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">Adaptive Cruise Control</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">Heated Leather Seats</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">Navigation System</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">360° Parking Camera</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<span class="text-[#111418] dark:text-gray-200">Burmester Surround Sound</span>
+</div>
+</div>
+</div>
+</div>
+<hr class="border-gray-200 dark:border-gray-800"/>
+<div class="flex flex-col gap-4">
+<h3 class="text-xl font-bold text-[#111418] dark:text-white">Rental Terms</h3>
+<div class="grid md:grid-cols-3 gap-6">
+<div class="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-lg border border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2 mb-2 text-[#111418] dark:text-white font-bold">
+<span class="material-symbols-outlined text-primary">local_gas_station</span>
+                                    Full-to-Full
+                                </div>
+<p class="text-xs text-[#617589] dark:text-gray-400">The car is supplied with a full tank of fuel and should be returned full.</p>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-lg border border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2 mb-2 text-[#111418] dark:text-white font-bold">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+                                    Deposit Required
+                                </div>
+<p class="text-xs text-[#617589] dark:text-gray-400">A security deposit of ₦50,000 will be held on your card at pickup.</p>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-lg border border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2 mb-2 text-[#111418] dark:text-white font-bold">
+<span class="material-symbols-outlined text-primary">event_available</span>
+                                    Free Cancellation
+                                </div>
+<p class="text-xs text-[#617589] dark:text-gray-400">Cancel for free up to 48 hours before your pick-up time.</p>
+</div>
+</div>
+</div>
+<hr class="border-gray-200 dark:border-gray-800"/>
+<div class="flex flex-col gap-6">
+<h3 class="text-xl font-bold text-[#111418] dark:text-white">Ratings &amp; Reviews</h3>
+<div class="flex flex-wrap gap-x-8 gap-y-6 bg-white dark:bg-[#1a202c] p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+<div class="flex flex-col gap-2">
+<p class="text-[#111418] dark:text-white text-5xl font-black leading-tight tracking-[-0.033em]">4.8</p>
+<div class="flex gap-0.5 text-secondary">
+<span class="material-symbols-outlined fill-current">star</span>
+<span class="material-symbols-outlined fill-current">star</span>
+<span class="material-symbols-outlined fill-current">star</span>
+<span class="material-symbols-outlined fill-current">star</span>
+<span class="material-symbols-outlined fill-current">star_half</span>
+</div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal leading-normal">Based on 124 reviews</p>
+</div>
+<div class="grid min-w-[200px] max-w-[400px] flex-1 grid-cols-[20px_1fr_40px] items-center gap-y-3">
+<p class="text-[#111418] dark:text-white text-sm font-medium">5</p>
+<div class="flex h-2 flex-1 overflow-hidden rounded-full bg-[#dbe0e6] dark:bg-gray-700"><div class="rounded-full bg-primary" style="width: 80%;"></div></div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal text-right">80%</p>
+<p class="text-[#111418] dark:text-white text-sm font-medium">4</p>
+<div class="flex h-2 flex-1 overflow-hidden rounded-full bg-[#dbe0e6] dark:bg-gray-700"><div class="rounded-full bg-primary" style="width: 12%;"></div></div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal text-right">12%</p>
+<p class="text-[#111418] dark:text-white text-sm font-medium">3</p>
+<div class="flex h-2 flex-1 overflow-hidden rounded-full bg-[#dbe0e6] dark:bg-gray-700"><div class="rounded-full bg-primary" style="width: 5%;"></div></div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal text-right">5%</p>
+<p class="text-[#111418] dark:text-white text-sm font-medium">2</p>
+<div class="flex h-2 flex-1 overflow-hidden rounded-full bg-[#dbe0e6] dark:bg-gray-700"><div class="rounded-full bg-primary" style="width: 1%;"></div></div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal text-right">1%</p>
+<p class="text-[#111418] dark:text-white text-sm font-medium">1</p>
+<div class="flex h-2 flex-1 overflow-hidden rounded-full bg-[#dbe0e6] dark:bg-gray-700"><div class="rounded-full bg-primary" style="width: 2%;"></div></div>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal text-right">2%</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 py-4 border-b border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="bg-gray-200 dark:bg-gray-700 h-10 w-10 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 font-bold">JD</div>
+<div>
+<p class="font-bold text-[#111418] dark:text-white text-sm">John Doe</p>
+<p class="text-xs text-[#617589] dark:text-gray-400">Oct 12, 2023</p>
+</div>
+</div>
+<div class="flex text-secondary text-sm">
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+<span class="material-symbols-outlined text-[16px] fill-current">star</span>
+</div>
+</div>
+<p class="text-[#111418] dark:text-gray-200 text-sm leading-relaxed">
+                                "The car was in pristine condition. The drive was smooth, and the tech features were amazing. Highly recommend for anyone looking for a premium experience."
+                            </p>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 relative">
+<div class="sticky top-24 flex flex-col gap-6 bg-white dark:bg-[#1a202c] p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-end border-b border-gray-100 dark:border-gray-700 pb-4">
+<div>
+<span class="text-3xl font-bold text-[#111418] dark:text-white">₦85,000</span>
+<span class="text-sm text-[#617589] dark:text-gray-400">/ day</span>
+</div>
+<div class="bg-[#e9f2e9] dark:bg-[#9CBF9B]/20 text-[#6a8c6a] dark:text-[#9CBF9B] px-2 py-1 rounded text-xs font-bold">
+                                Best Price
+                            </div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-[#617589] uppercase">Pick-up Location</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400">location_on</span>
+</div>
+<select class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-sm text-[#111418] dark:text-white focus:ring-primary focus:border-primary">
+<option>Lagos - Murtala Muhammed Intl (LOS)</option>
+<option>Abuja - Nnamdi Azikiwe Intl (ABV)</option>
+<option>Port Harcourt Intl (PHC)</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-[#617589] uppercase">Pick-up</label>
+<div class="relative">
+<input class="w-full pl-3 pr-2 py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-sm text-[#111418] dark:text-white focus:ring-primary focus:border-primary" type="date" value="2023-11-20"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-[#617589] uppercase">Drop-off</label>
+<div class="relative">
+<input class="w-full pl-3 pr-2 py-3 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-sm text-[#111418] dark:text-white focus:ring-primary focus:border-primary" type="date" value="2023-11-23"/>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+<div class="flex items-center gap-3">
+<div class="h-5 w-5 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center"></div>
+<span class="text-sm font-medium text-[#111418] dark:text-white">Full Insurance</span>
+</div>
+<span class="text-sm font-bold text-[#111418] dark:text-white">+₦15,000/day</span>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 flex flex-col gap-2">
+<div class="flex justify-between text-sm">
+<span class="text-[#617589] dark:text-gray-400">Car Hire Charge (3 days)</span>
+<span class="text-[#111418] dark:text-white font-medium">₦255,000</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-[#617589] dark:text-gray-400">Taxes &amp; Fees</span>
+<span class="text-[#111418] dark:text-white font-medium">₦34,500</span>
+</div>
+<div class="h-px bg-gray-200 dark:bg-gray-700 my-1"></div>
+<div class="flex justify-between items-center">
+<span class="text-base font-bold text-[#111418] dark:text-white">Total</span>
+<span class="text-xl font-bold text-accent">₦289,500</span>
+</div>
+</div>
+<button class="w-full py-4 bg-primary hover:bg-[#8bb08a] text-white font-bold rounded-lg transition-all shadow-lg shadow-[#9CBF9B]/30 flex items-center justify-center gap-2">
+<span>Book This Car</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<p class="text-center text-xs text-[#617589] dark:text-gray-500">
+                            You won't be charged yet.
+                        </p>
+</div>
+<div class="mt-6 flex flex-col gap-3 px-2">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">verified_user</span>
+<div>
+<p class="text-xs font-bold text-[#111418] dark:text-white">Price Match Guarantee</p>
+<p class="text-[10px] text-[#617589] dark:text-gray-400">Found it cheaper? We'll match it.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">clean_hands</span>
+<div>
+<p class="text-xs font-bold text-[#111418] dark:text-white">Enhanced Cleaning</p>
+<p class="text-[10px] text-[#617589] dark:text-gray-400">This car is rigorously sanitized.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

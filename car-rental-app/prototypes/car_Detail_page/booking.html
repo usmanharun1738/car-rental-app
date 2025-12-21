@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Details - CARTAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#E3655B","secondary": "#9CBF9B","accent": "#CFD186","background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1b2733",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#2d3b4a",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 py-4 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="size-8 text-secondary">
+<svg class="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-tight">CARTAR</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Locations</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Vehicles</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Deals</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Manage Booking</a>
+</nav>
+<div class="flex items-center gap-3">
+<div class="hidden lg:flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-lg">lock</span>
+                Secure Checkout
+            </div>
+<div class="w-px h-6 bg-border-light dark:bg-border-dark hidden lg:block"></div>
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary hover:opacity-90 text-white text-sm font-bold transition-colors">
+                Sign In
+            </button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-8">
+<div class="flex flex-col lg:flex-row gap-8 xl:gap-12 relative">
+<div class="flex-1 flex flex-col gap-8 min-w-0">
+<div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-lg">search</span> Search
+                </a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-lg">directions_car</span> Select Car
+                </a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-lg fill-current">edit_note</span> Booking Details
+                    </span>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="text-slate-400 dark:text-slate-600">Confirmation</span>
+</div>
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Finalize your booking</h1>
+<p class="text-slate-600 dark:text-slate-400 text-base md:text-lg">Review your itinerary and enter your details to secure this car.</p>
+</div>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+<div class="flex items-center gap-3 mb-6 pb-4 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary/20 text-secondary text-sm font-bold">1</div>
+<h2 class="text-xl font-bold">Driver Information</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">First Name</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="e.g. John" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Last Name</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="e.g. Doe" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="john.doe@example.com" type="email"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Phone Number</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="+234 800 000 0000" type="tel"/>
+</div>
+</div>
+<div class="mt-4 flex items-start gap-2 text-sm text-slate-500 dark:text-slate-400 bg-background-light dark:bg-background-dark p-3 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-lg mt-0.5">info</span>
+<p>Driver must be at least 25 years old to rent this vehicle without a young driver fee.</p>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+<div class="flex items-center gap-3 mb-6 pb-4 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary/20 text-secondary text-sm font-bold">2</div>
+<h2 class="text-xl font-bold">Customize Your Trip</h2>
+</div>
+<div class="space-y-4">
+<label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-center w-12 h-12 rounded-lg bg-background-light dark:bg-slate-800 text-secondary">
+<span class="material-symbols-outlined text-2xl">security</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Full Protection Insurance</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Zero excess liability. Covers theft, damage, and personal injury.</p>
+</div>
+<div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+<span class="text-sm font-bold text-slate-900 dark:text-white">+₦14,000<span class="text-slate-500 font-normal">/day</span></span>
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary transition-all cursor-pointer" type="checkbox"/>
+</div>
+</label>
+<label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-center w-12 h-12 rounded-lg bg-background-light dark:bg-slate-800 text-secondary">
+<span class="material-symbols-outlined text-2xl">child_care</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Child Safety Seat</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Suitable for children 9-18kg (approx 9 months to 4 years).</p>
+</div>
+<div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+<span class="text-sm font-bold text-slate-900 dark:text-white">+₦8,000<span class="text-slate-500 font-normal">/day</span></span>
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary transition-all cursor-pointer" type="checkbox"/>
+</div>
+</label>
+<label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-center w-12 h-12 rounded-lg bg-background-light dark:bg-slate-800 text-secondary">
+<span class="material-symbols-outlined text-2xl">explore</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">GPS Navigation System</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Pre-loaded maps with live traffic updates.</p>
+</div>
+<div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+<span class="text-sm font-bold text-slate-900 dark:text-white">+₦5,000<span class="text-slate-500 font-normal">/day</span></span>
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary transition-all cursor-pointer" type="checkbox"/>
+</div>
+</label>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+<div class="flex items-center gap-3 mb-6 pb-4 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary/20 text-secondary text-sm font-bold">3</div>
+<h2 class="text-xl font-bold">Payment Details</h2>
+</div>
+<div class="flex gap-4 mb-6">
+<button class="flex-1 py-3 px-4 rounded-lg bg-primary/10 text-primary border border-primary font-bold text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">credit_card</span> Credit Card
+                    </button>
+<button class="flex-1 py-3 px-4 rounded-lg bg-background-light dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-transparent hover:border-border-light font-medium text-sm flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined">account_balance_wallet</span> PayPal
+                    </button>
+</div>
+<div class="space-y-5">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Card Number</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-3 text-slate-400">credit_card</span>
+<input class="w-full h-12 pl-12 pr-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white font-mono" placeholder="0000 0000 0000 0000" type="text"/>
+<div class="absolute right-4 top-3.5 flex gap-2 opacity-50">
+<div class="w-8 h-5 bg-slate-200 rounded-sm"></div>
+<div class="w-8 h-5 bg-slate-200 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-5">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Expiry Date</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="MM / YY" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">CVC / CVV</label>
+<div class="relative">
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="123" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-3 text-slate-400 cursor-help" title="3 digits on back of card">help</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Cardholder Name</label>
+<input class="w-full h-12 px-4 rounded-lg border-border-light dark:border-border-dark bg-white dark:bg-surface-dark focus:ring-2 focus:ring-primary focus:border-primary transition-all dark:text-white" placeholder="Name as on card" type="text"/>
+</div>
+<div class="flex items-center gap-3 pt-2">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary transition-all cursor-pointer" id="terms" type="checkbox"/>
+<label class="text-sm text-slate-600 dark:text-slate-400 cursor-pointer" for="terms">
+                            I agree to the <a class="text-primary hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                        </label>
+</div>
+</div>
+<div class="mt-8">
+<button class="w-full h-14 bg-primary hover:opacity-90 text-white text-lg font-bold rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]">
+<span class="material-symbols-outlined">lock</span> Confirm &amp; Pay ₦428,500
+                    </button>
+<p class="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-sm">security</span>
+                        Payments are secured with 256-bit SSL encryption
+                    </p>
+</div>
+</section>
+</div>
+<div class="lg:w-[380px] min-w-[320px] shrink-0">
+<div class="sticky top-24 flex flex-col gap-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center p-6">
+<img alt="Car Image" class="w-full h-full object-contain drop-shadow-xl" data-alt="Modern blue electric sedan car parked in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC9mbWZWStG-VyhJcTsfdJhNmG6pMUrTAWDh2DtU4EER8w0GnwJq1dnuWhAKNrUu1EEqJyKVzkcp0mt5fXAETK-6vHg7O1gxvF7mfStJ2Ov6AXoPGLuYBRBCI3Dg-XLQ7HQkff11yWPlP6woPfLh1AIu75CsnPddkTFO_qOdcM5NOvYfHpEQm4xmOLod5f14oT8rW3JWwebySK6N6foGnldxhmOnpsE7z3nuzquSzjZ4f3s4BZDJzD1L4pi1hXM8UqEVGdPwTxhNZr"/>
+<div class="absolute top-4 left-4 bg-white/90 dark:bg-black/60 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white border border-accent">Premium</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Tesla Model 3</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">or similar electric sedan</p>
+</div>
+<div class="flex gap-1 text-slate-400">
+<span class="material-symbols-outlined" title="5 Seats">group</span>
+<span class="text-xs font-medium self-center">5</span>
+<span class="material-symbols-outlined ml-1" title="Automatic">settings</span>
+<span class="text-xs font-medium self-center">A</span>
+</div>
+</div>
+<div class="space-y-4 relative pb-6 border-b border-border-light dark:border-border-dark border-dashed">
+<div class="flex gap-3 relative z-10">
+<div class="mt-1 text-secondary">
+<span class="material-symbols-outlined text-xl">location_on</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Location</p>
+<p class="font-bold text-slate-900 dark:text-white text-sm">Murtala Muhammed Int. Airport, Lagos</p>
+<p class="text-sm text-slate-500">Thu, Oct 12 - Mon, Oct 16</p>
+</div>
+</div>
+</div>
+<div class="py-6 space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">Car Rental Fee (4 days)</span>
+<span class="font-medium text-slate-900 dark:text-white">₦320,000</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">Taxes &amp; Fees</span>
+<span class="font-medium text-slate-900 dark:text-white">₦42,500</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">Full Insurance</span>
+<span class="font-medium text-slate-900 dark:text-white">₦56,000</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">GPS Navigation</span>
+<span class="font-medium text-slate-900 dark:text-white">₦20,000</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-secondary font-medium">Weekly Discount</span>
+<span class="font-medium text-secondary">-₦10,000</span>
+</div>
+</div>
+<div class="pt-4 border-t border-border-light dark:border-border-dark flex items-end justify-between">
+<span class="text-slate-500 text-sm font-medium">Total Price</span>
+<div class="text-right">
+<span class="block text-3xl font-black text-slate-900 dark:text-white leading-none">₦428,500</span>
+<span class="text-xs text-slate-400">NGN, includes all taxes</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-background-light dark:bg-slate-800/50 p-4 rounded-xl flex gap-3 items-start border border-border-light dark:border-slate-700">
+<span class="material-symbols-outlined text-secondary">support_agent</span>
+<div>
+<p class="text-sm font-bold text-slate-900 dark:text-white">Need Help?</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Call our support team 24/7 at <a class="text-primary font-medium hover:underline" href="#">+234 800 123 4567</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto border-t border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark py-8 px-6 lg:px-10">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-sm text-slate-500 dark:text-slate-400">© 2023 CARTAR Inc. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Sitemap</a>
+</div>
+</div>
+</footer>
+
+</body></html>
