@@ -153,9 +153,9 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                         <div class="group flex flex-col gap-4 rounded-xl bg-white shadow-sm hover:shadow-md transition-all border border-transparent hover:border-[#FF6B35]/20 p-4">
                             <!-- Vehicle Image -->
                             <div class="aspect-[4/3] w-full rounded-lg bg-gray-100 relative overflow-hidden flex items-center justify-center">
-                                @if($vehicle->image_url)
+                                @if($vehicle->primary_image_url)
                                     <img 
-                                        src="{{ Storage::url($vehicle->image_url) }}" 
+                                        src="{{ $vehicle->primary_image_url }}" 
                                         alt="{{ $vehicle->make }} {{ $vehicle->model }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     >

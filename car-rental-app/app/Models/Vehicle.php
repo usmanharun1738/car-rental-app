@@ -50,6 +50,37 @@ class Vehicle extends Model
         return $this->belongsToMany(Feature::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(VehicleImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the primary image or first image
+     */
+    public function getPrimaryImageAttribute(): ?VehicleImage
+    {
+        return $this->images->firstWhere('is_primary', true) 
+            ?? $this->images->first();
+    }
+
+    /**
+     * Get the primary image URL (for backward compatibility)
+     */
+    public function getPrimaryImageUrlAttribute(): ?string
+    {
+        if ($primaryImage = $this->primary_image) {
+            return $primaryImage->url;
+        }
+        
+        // Fallback to old image_url if exists
+        if ($this->image_url) {
+            return asset('storage/' . $this->image_url);
+        }
+        
+        return null;
+    }
+
     /**
      * Get mileage display string
      */

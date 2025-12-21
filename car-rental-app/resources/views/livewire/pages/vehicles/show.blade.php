@@ -176,14 +176,16 @@ new #[Layout('components.layouts.guest')] class extends Component
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Column: Vehicle Info -->
             <div class="lg:col-span-8 flex flex-col gap-8">
-                <!-- Main Image -->
+                <!-- Main Image & Gallery -->
                 <div class="flex flex-col gap-4">
+                    <!-- Main Image -->
                     <div class="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 relative group">
-                        @if($vehicle->image_url)
+                        @if($vehicle->primary_image_url)
                             <img 
-                                src="{{ Storage::url($vehicle->image_url) }}" 
+                                src="{{ $vehicle->primary_image_url }}" 
                                 alt="{{ $vehicle->make }} {{ $vehicle->model }}"
                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                id="mainVehicleImage"
                             >
                         @else
                             <div class="w-full h-full flex items-center justify-center">
@@ -197,6 +199,24 @@ new #[Layout('components.layouts.guest')] class extends Component
                             {{ $vehicle->status->label() }}
                         </div>
                     </div>
+                    
+                    <!-- Image Thumbnails -->
+                    @if($vehicle->images->count() > 1)
+                        <div class="flex gap-2 overflow-x-auto pb-2">
+                            @foreach($vehicle->images as $index => $image)
+                                <button 
+                                    onclick="document.getElementById('mainVehicleImage').src = '{{ $image->url }}'"
+                                    class="flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all hover:border-[#FF6B35] {{ $index === 0 ? 'border-[#FF6B35]' : 'border-gray-200' }}"
+                                >
+                                    <img 
+                                        src="{{ $image->url }}" 
+                                        alt="{{ $image->alt_text ?? $vehicle->make . ' ' . $vehicle->model }}"
+                                        class="w-full h-full object-cover"
+                                    >
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Vehicle Specs -->

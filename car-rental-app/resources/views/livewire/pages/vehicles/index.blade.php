@@ -268,9 +268,9 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
                             <div class="group bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#FF6B35]/30 transition-all duration-300 flex flex-col">
                                 <!-- Vehicle Image -->
                                 <div class="relative aspect-[4/3] bg-gray-50 overflow-hidden">
-                                    @if($vehicle->image_url)
+                                    @if($vehicle->primary_image_url)
                                         <img 
-                                            src="{{ Storage::url($vehicle->image_url) }}" 
+                                            src="{{ $vehicle->primary_image_url }}" 
                                             alt="{{ $vehicle->make }} {{ $vehicle->model }}"
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         >
