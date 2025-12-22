@@ -34,7 +34,13 @@ class DriverLicenseResource extends Resource
                 TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn (DriverLicense $record): string => $record->user?->email ?? ''),
+                ImageColumn::make('front_image_path')
+                    ->label('License')
+                    ->disk('public')
+                    ->circular()
+                    ->size(40),
                 TextColumn::make('license_number')
                     ->label('License #')
                     ->searchable()
@@ -101,6 +107,82 @@ class DriverLicenseResource extends Resource
                     }),
             ])
             ->bulkActions([]);
+    }
+
+    public static function infolist(Schema $infolist): Schema
+    {
+        return $infolist
+            ->components([
+                // Customer Information
+                \Filament\Infolists\Components\TextEntry::make('user.name')
+                    ->label('Customer Name'),
+                \Filament\Infolists\Components\TextEntry::make('user.email')
+                    ->label('Email')
+                    ->copyable(),
+                \Filament\Infolists\Components\TextEntry::make('user.phone')
+                    ->label('Phone')
+                    ->placeholder('Not provided'),
+
+                // License Details
+                \Filament\Infolists\Components\TextEntry::make('license_number')
+                    ->label('License Number')
+                    ->fontFamily('mono')
+                    ->copyable(),
+                \Filament\Infolists\Components\TextEntry::make('full_name')
+                    ->label('Name on License'),
+                \Filament\Infolists\Components\TextEntry::make('date_of_birth')
+                    ->label('Date of Birth')
+                    ->date(),
+                \Filament\Infolists\Components\TextEntry::make('sex')
+                    ->label('Sex')
+                    ->formatStateUsing(fn ($state) => $state === 'M' ? 'Male' : 'Female'),
+                \Filament\Infolists\Components\TextEntry::make('license_class')
+                    ->label('License Class')
+                    ->badge()
+                    ->color('primary'),
+                \Filament\Infolists\Components\TextEntry::make('state_of_issue')
+                    ->label('State of Issue'),
+                \Filament\Infolists\Components\TextEntry::make('issuing_authority')
+                    ->label('Issuing Authority')
+                    ->placeholder('-'),
+                \Filament\Infolists\Components\TextEntry::make('issue_date')
+                    ->label('Issue Date')
+                    ->date(),
+                \Filament\Infolists\Components\TextEntry::make('expiry_date')
+                    ->label('Expiry Date')
+                    ->date(),
+
+                // Verification Status
+                \Filament\Infolists\Components\TextEntry::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (LicenseStatus $state) => $state->label())
+                    ->color(fn (LicenseStatus $state) => $state->color()),
+                \Filament\Infolists\Components\TextEntry::make('verified_at')
+                    ->label('Verified At')
+                    ->dateTime()
+                    ->placeholder('Not verified'),
+                \Filament\Infolists\Components\TextEntry::make('verifier.name')
+                    ->label('Verified By')
+                    ->placeholder('N/A'),
+                \Filament\Infolists\Components\TextEntry::make('rejection_reason')
+                    ->label('Rejection Reason')
+                    ->placeholder('-')
+                    ->columnSpanFull(),
+                \Filament\Infolists\Components\TextEntry::make('created_at')
+                    ->label('Submitted At')
+                    ->dateTime(),
+
+                // License Images
+                \Filament\Infolists\Components\ImageEntry::make('front_image_path')
+                    ->label('Front of License')
+                    ->disk('public')
+                    ->height(200),
+                \Filament\Infolists\Components\ImageEntry::make('back_image_path')
+                    ->label('Back of License')
+                    ->disk('public')
+                    ->height(200),
+            ]);
     }
 
     public static function getRelations(): array

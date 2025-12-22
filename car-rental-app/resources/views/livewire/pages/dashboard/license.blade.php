@@ -258,12 +258,12 @@ new #[Layout('components.layouts.dashboard')] #[Title('Driver\'s License - CARTA
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">License Number *</label>
-                                    <input wire:model="licenseNumber" type="text" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" placeholder="e.g., ABJ123456789">
+                                    <input wire:model="licenseNumber" type="text" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" placeholder="e.g., ABJ123456789">
                                     @error('licenseNumber') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Full Name (as on license) *</label>
-                                    <input wire:model="fullName" type="text" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <input wire:model="fullName" type="text" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                     @error('fullName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -271,12 +271,12 @@ new #[Layout('components.layouts.dashboard')] #[Title('Driver\'s License - CARTA
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Date of Birth *</label>
-                                    <input wire:model="dateOfBirth" type="date" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <input wire:model="dateOfBirth" type="date" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                     @error('dateOfBirth') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">License Class *</label>
-                                    <select wire:model="licenseClass" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <select wire:model="licenseClass" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                         <option value="A">A - Motorcycle</option>
                                         <option value="B">B - Light Vehicle</option>
                                         <option value="C">C - Light Commercial</option>
@@ -287,14 +287,14 @@ new #[Layout('components.layouts.dashboard')] #[Title('Driver\'s License - CARTA
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Sex *</label>
-                                    <select wire:model="sex" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <select wire:model="sex" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                         <option value="M">Male</option>
                                         <option value="F">Female</option>
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">State of Issue *</label>
-                                    <select wire:model="stateOfIssue" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <select wire:model="stateOfIssue" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                         <option value="">Select State</option>
                                         <option value="FCT Abuja">FCT Abuja</option>
                                         <option value="Lagos">Lagos</option>
@@ -314,12 +314,12 @@ new #[Layout('components.layouts.dashboard')] #[Title('Driver\'s License - CARTA
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Issue Date *</label>
-                                    <input wire:model="issueDate" type="date" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <input wire:model="issueDate" type="date" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                     @error('issueDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Expiry Date *</label>
-                                    <input wire:model="expiryDate" type="date" class="w-full py-3 rounded-lg border-slate-300 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
+                                    <input wire:model="expiryDate" type="date" class="w-full py-3 px-4 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50">
                                     @error('expiryDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>

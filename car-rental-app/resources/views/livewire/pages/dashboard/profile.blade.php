@@ -229,12 +229,12 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
                     <form wire:submit="saveProfile" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-1.5">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide" for="firstName">First Name</label>
-                            <input wire:model="firstName" class="w-full py-3 rounded-lg border-slate-300 text-slate-900 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="firstName" type="text">
+                            <input wire:model="firstName" class="w-full py-3 px-4 rounded-lg border border-slate-200 text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="firstName" type="text">
                             @error('firstName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide" for="lastName">Last Name</label>
-                            <input wire:model="lastName" class="w-full py-3 rounded-lg border-slate-300 text-slate-900 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="lastName" type="text">
+                            <input wire:model="lastName" class="w-full py-3 px-4 rounded-lg border border-slate-200 text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="lastName" type="text">
                             @error('lastName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-1.5 md:col-span-2">
@@ -243,7 +243,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="material-symbols-outlined text-slate-400 text-[20px]">mail</span>
                                 </span>
-                                <input wire:model="email" class="w-full py-3 pl-10 rounded-lg border-slate-300 text-slate-900 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="email" type="email" disabled>
+                                <input wire:model="email" class="w-full py-3 px-4 pl-10 rounded-lg border border-slate-200 text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="email" type="email" disabled>
                             </div>
                             <p class="text-xs text-slate-400">Email cannot be changed</p>
                         </div>
@@ -253,7 +253,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="material-symbols-outlined text-slate-400 text-[20px]">call</span>
                                 </span>
-                                <input wire:model="phone" class="w-full py-3 pl-10 rounded-lg border-slate-300 text-slate-900 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="phone" type="tel" placeholder="+234 800 123 4567">
+                                <input wire:model="phone" class="w-full py-3 px-4 pl-10 rounded-lg border border-slate-200 text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#E3655B] focus:border-[#E3655B] bg-slate-50" id="phone" type="tel" placeholder="+234 800 123 4567">
                             </div>
                             @error('phone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
