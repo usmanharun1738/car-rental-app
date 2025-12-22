@@ -107,7 +107,16 @@ new #[Layout('components.layouts.guest')] class extends Component
 
     public function proceedToBooking(): void
     {
+        // Build the booking URL with parameters
+        $bookingUrl = route('booking.create', [
+            'vehicle' => $this->vehicle->id,
+            'start' => $this->startDate,
+            'end' => $this->endDate,
+        ]);
+
         if (!auth()->check()) {
+            // Store the intended URL so user is redirected back after login
+            session()->put('url.intended', $bookingUrl);
             session()->flash('message', 'Please log in to book a vehicle.');
             $this->redirect(route('login'));
             return;
@@ -117,12 +126,8 @@ new #[Layout('components.layouts.guest')] class extends Component
             return;
         }
 
-        // Redirect to booking wizard with parameters
-        $this->redirect(route('booking.create', [
-            'vehicle' => $this->vehicle->id,
-            'start' => $this->startDate,
-            'end' => $this->endDate,
-        ]));
+        // Redirect to booking wizard
+        $this->redirect($bookingUrl);
     }
 }; ?>
 

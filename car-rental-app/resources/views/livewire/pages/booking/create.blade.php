@@ -10,16 +10,27 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\{Layout, Title, Computed};
 use Carbon\Carbon;
 
-new #[Layout('components.layouts.guest')] #[Title('Complete Your Booking - CARTAR')] class extends Component
+new #[Layout('components.layouts.guest')] #[Title('Finalize Your Booking - CARTAR')] class extends Component
 {
     // Booking data from URL
     public ?int $vehicleId = null;
     public ?string $startDate = null;
     public ?string $endDate = null;
     
-    // Wizard state
-    public int $step = 1;
+    // Driver information (we'll use authenticated user data)
+    public string $firstName = '';
+    public string $lastName = '';
+    public string $email = '';
+    public string $phone = '';
+    
+    // Add-ons
+    public bool $fullInsurance = false;
+    public bool $childSeat = false;
+    public bool $gpsNavigation = false;
+    
+    // Other
     public string $notes = '';
+    public bool $agreedToTerms = false;
     
     // Calculated values
     public ?float $totalPrice = null;
@@ -54,30 +65,52 @@ new #[Layout('components.layouts.guest')] #[Title('Complete Your Booking - CARTA
         
         $this->totalDays = max(1, $start->diffInDays($end));
         $this->totalPrice = app(CalculateBookingPriceAction::class)->execute($vehicle, $start, $end);
+        
+        // Pre-fill user info
+        $user = auth()->user();
+        if ($user) {
+            $nameParts = explode(' ', $user->name, 2);
+            $this->firstName = $nameParts[0] ?? '';
+            $this->lastName = $nameParts[1] ?? '';
+            $this->email = $user->email;
+            $this->phone = $user->phone ?? '';
+        }
     }
 
     #[Computed]
     public function vehicle(): ?Vehicle
     {
-        return Vehicle::find($this->vehicleId);
+        return Vehicle::with('images')->find($this->vehicleId);
     }
 
-    public function nextStep(): void
+    #[Computed]
+    public function addOnsTotal(): float
     {
-        if ($this->step < 3) {
-            $this->step++;
-        }
+        $total = 0;
+        if ($this->fullInsurance) $total += 14000 * $this->totalDays;
+        if ($this->childSeat) $total += 8000 * $this->totalDays;
+        if ($this->gpsNavigation) $total += 5000 * $this->totalDays;
+        return $total;
     }
 
-    public function previousStep(): void
+    #[Computed]
+    public function grandTotal(): float
     {
-        if ($this->step > 1) {
-            $this->step--;
-        }
+        return $this->totalPrice + $this->addOnsTotal;
     }
 
     public function confirmBooking(): void
     {
+        $this->validate([
+            'firstName' => 'required|string|min:2',
+            'lastName' => 'required|string|min:2',
+            'email' => 'required|email',
+            'phone' => 'required|string|min:10',
+            'agreedToTerms' => 'accepted',
+        ], [
+            'agreedToTerms.accepted' => 'You must agree to the terms and conditions.',
+        ]);
+
         try {
             // Re-check availability before creating
             $vehicle = $this->vehicle;
@@ -91,17 +124,27 @@ new #[Layout('components.layouts.guest')] #[Title('Complete Your Booking - CARTA
                 return;
             }
 
+            // Build notes with add-ons info
+            $addOnNotes = [];
+            if ($this->fullInsurance) $addOnNotes[] = 'Full Protection Insurance';
+            if ($this->childSeat) $addOnNotes[] = 'Child Safety Seat';
+            if ($this->gpsNavigation) $addOnNotes[] = 'GPS Navigation';
+            
+            $fullNotes = $this->notes;
+            if (!empty($addOnNotes)) {
+                $fullNotes .= "\nAdd-ons: " . implode(', ', $addOnNotes);
+            }
+
             // Create the booking using our Action
             $this->booking = app(CreateBookingAction::class)->execute(
                 userId: auth()->id(),
                 vehicleId: $this->vehicleId,
                 startTime: $start,
                 endTime: $end,
-                notes: $this->notes ?: null
+                notes: $fullNotes ?: null
             );
 
             $this->bookingConfirmed = true;
-            $this->step = 3;
 
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
@@ -109,246 +152,333 @@ new #[Layout('components.layouts.guest')] #[Title('Complete Your Booking - CARTA
     }
 }; ?>
 
-<div class="min-h-[70vh]">
-    <!-- Progress Steps -->
-    <div class="bg-white border-b">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex items-center justify-between">
-                @foreach([1 => 'Review', 2 => 'Confirm', 3 => 'Complete'] as $num => $label)
-                    <div class="flex items-center">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full 
-                            {{ $step >= $num ? 'bg-[#1E3A5F] text-white' : 'bg-gray-200 text-gray-500' }}">
-                            @if($step > $num)
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            @else
-                                {{ $num }}
-                            @endif
-                        </div>
-                        <span class="ml-3 text-sm font-medium {{ $step >= $num ? 'text-gray-900' : 'text-gray-500' }}">
-                            {{ $label }}
-                        </span>
-                    </div>
-                    @if($num < 3)
-                        <div class="flex-1 mx-4 h-0.5 {{ $step > $num ? 'bg-[#1E3A5F]' : 'bg-gray-200' }}"></div>
-                    @endif
-                @endforeach
+<div class="min-h-[70vh] bg-[#f6f7f8]">
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-4">
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <a class="hover:text-[#E3655B] transition-colors flex items-center gap-1" href="{{ route('home') }}" wire:navigate>
+                    <span class="material-symbols-outlined text-lg">search</span> Search
+                </a>
+                <span class="material-symbols-outlined text-base">chevron_right</span>
+                <a class="hover:text-[#E3655B] transition-colors flex items-center gap-1" href="{{ route('vehicles.show', $this->vehicle) }}" wire:navigate>
+                    <span class="material-symbols-outlined text-lg">directions_car</span> Select Car
+                </a>
+                <span class="material-symbols-outlined text-base">chevron_right</span>
+                <span class="text-[#E3655B] font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">edit_note</span> Booking Details
+                </span>
+                <span class="material-symbols-outlined text-base">chevron_right</span>
+                <span class="text-gray-400">Confirmation</span>
             </div>
         </div>
     </div>
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-8">
         @if(session('error'))
             <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
                 {{ session('error') }}
             </div>
         @endif
 
-        <!-- Step 1: Review Booking -->
-        @if($step === 1)
-            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Review Your Booking</h2>
-
-                @if($this->vehicle)
-                    <!-- Vehicle Summary -->
-                    <div class="flex gap-6 mb-8 pb-8 border-b">
-                        <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                            @if($this->vehicle->image_url)
-                                <img src="{{ Storage::url($this->vehicle->image_url) }}" 
-                                     alt="{{ $this->vehicle->make }}"
-                                     class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                                    </svg>
-                                </div>
-                            @endif
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">
-                                {{ $this->vehicle->make }} {{ $this->vehicle->model }}
-                            </h3>
-                            <p class="text-gray-500">{{ $this->vehicle->year }}</p>
-                            <p class="text-[#1E3A5F] font-medium mt-2">₦{{ number_format($this->vehicle->daily_rate) }}/day</p>
-                        </div>
-                    </div>
-
-                    <!-- Booking Details -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Pick-up Date</label>
-                            <p class="text-lg font-medium text-gray-900">{{ Carbon::parse($startDate)->format('D, M d, Y') }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Return Date</label>
-                            <p class="text-lg font-medium text-gray-900">{{ Carbon::parse($endDate)->format('D, M d, Y') }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Price Summary -->
-                    <div class="bg-gray-50 rounded-xl p-6">
-                        <h4 class="font-semibold text-gray-900 mb-4">Price Summary</h4>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Daily Rate</span>
-                                <span>₦{{ number_format($this->vehicle->daily_rate) }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Duration</span>
-                                <span>{{ $totalDays }} {{ Str::plural('day', $totalDays) }}</span>
-                            </div>
-                            <div class="flex justify-between pt-2 border-t font-semibold text-lg">
-                                <span>Total</span>
-                                <span class="text-[#1E3A5F]">₦{{ number_format($totalPrice) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="flex justify-between mt-8">
-                    <a href="{{ route('vehicles.show', $this->vehicle) }}" 
-                       class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                       wire:navigate>
-                        ← Back
-                    </a>
-                    <button wire:click="nextStep" 
-                            class="px-8 py-3 bg-[#FF6B35] text-white font-semibold rounded-lg hover:bg-[#e55a2b] transition">
-                        Continue →
-                    </button>
-                </div>
+        @if(!$bookingConfirmed)
+            <!-- Main Booking Form -->
+            <div class="flex flex-col gap-2 mb-8">
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Finalize your booking</h1>
+                <p class="text-gray-600 text-base md:text-lg">Review your itinerary and enter your details to secure this car.</p>
             </div>
-        @endif
 
-        <!-- Step 2: Confirm & Notes -->
-        @if($step === 2)
-            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Confirm Your Booking</h2>
+            <div class="flex flex-col lg:flex-row gap-8 xl:gap-12">
+                <!-- Left Column: Forms -->
+                <div class="flex-1 flex flex-col gap-8 min-w-0">
+                    
+                    <!-- Section 1: Driver Information -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-[#9CBF9B]/20 text-[#9CBF9B] text-sm font-bold">1</div>
+                            <h2 class="text-xl font-bold text-gray-900">Driver Information</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold text-gray-700">First Name</label>
+                                <input wire:model="firstName" type="text" 
+                                    class="w-full h-12 px-4 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-[#E3655B] focus:border-[#E3655B] transition-all" 
+                                    placeholder="e.g. John">
+                                @error('firstName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold text-gray-700">Last Name</label>
+                                <input wire:model="lastName" type="text" 
+                                    class="w-full h-12 px-4 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-[#E3655B] focus:border-[#E3655B] transition-all" 
+                                    placeholder="e.g. Doe">
+                                @error('lastName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold text-gray-700">Email Address</label>
+                                <input wire:model="email" type="email" 
+                                    class="w-full h-12 px-4 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-[#E3655B] focus:border-[#E3655B] transition-all" 
+                                    placeholder="john.doe@example.com">
+                                @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold text-gray-700">Phone Number</label>
+                                <input wire:model="phone" type="tel" 
+                                    class="w-full h-12 px-4 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-[#E3655B] focus:border-[#E3655B] transition-all" 
+                                    placeholder="+234 800 000 0000">
+                                @error('phone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-start gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                            <span class="material-symbols-outlined text-[#9CBF9B] text-lg mt-0.5">info</span>
+                            <p>Driver must be at least 25 years old to rent this vehicle without a young driver fee.</p>
+                        </div>
+                    </section>
 
-                <!-- Customer Info -->
-                <div class="mb-8">
-                    <h3 class="font-semibold text-gray-900 mb-4">Your Details</h3>
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="font-medium">{{ auth()->user()->name }}</p>
-                        <p class="text-gray-600">{{ auth()->user()->email }}</p>
-                        @if(auth()->user()->phone)
-                            <p class="text-gray-600">{{ auth()->user()->phone }}</p>
+                    <!-- Section 2: Customize Your Trip -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-[#9CBF9B]/20 text-[#9CBF9B] text-sm font-bold">2</div>
+                            <h2 class="text-xl font-bold text-gray-900">Customize Your Trip</h2>
+                        </div>
+                        <div class="space-y-4">
+                            <!-- Full Protection Insurance -->
+                            <label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#E3655B] cursor-pointer transition-colors group {{ $fullInsurance ? 'border-[#E3655B] bg-[#E3655B]/5' : '' }}">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 text-[#9CBF9B]">
+                                    <span class="material-symbols-outlined text-2xl">security</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-gray-900 group-hover:text-[#E3655B] transition-colors">Full Protection Insurance</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Zero excess liability. Covers theft, damage, and personal injury.</p>
+                                </div>
+                                <div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+                                    <span class="text-sm font-bold text-gray-900">+₦14,000<span class="text-gray-500 font-normal">/day</span></span>
+                                    <input wire:model.live="fullInsurance" type="checkbox" class="w-5 h-5 rounded border-gray-300 text-[#E3655B] focus:ring-[#E3655B] cursor-pointer">
+                                </div>
+                            </label>
+
+                            <!-- Child Safety Seat -->
+                            <label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#E3655B] cursor-pointer transition-colors group {{ $childSeat ? 'border-[#E3655B] bg-[#E3655B]/5' : '' }}">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 text-[#9CBF9B]">
+                                    <span class="material-symbols-outlined text-2xl">child_care</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-gray-900 group-hover:text-[#E3655B] transition-colors">Child Safety Seat</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Suitable for children 9-18kg (approx 9 months to 4 years).</p>
+                                </div>
+                                <div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+                                    <span class="text-sm font-bold text-gray-900">+₦8,000<span class="text-gray-500 font-normal">/day</span></span>
+                                    <input wire:model.live="childSeat" type="checkbox" class="w-5 h-5 rounded border-gray-300 text-[#E3655B] focus:ring-[#E3655B] cursor-pointer">
+                                </div>
+                            </label>
+
+                            <!-- GPS Navigation -->
+                            <label class="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#E3655B] cursor-pointer transition-colors group {{ $gpsNavigation ? 'border-[#E3655B] bg-[#E3655B]/5' : '' }}">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 text-[#9CBF9B]">
+                                    <span class="material-symbols-outlined text-2xl">explore</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-gray-900 group-hover:text-[#E3655B] transition-colors">GPS Navigation System</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Pre-loaded maps with live traffic updates.</p>
+                                </div>
+                                <div class="flex items-center gap-4 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
+                                    <span class="text-sm font-bold text-gray-900">+₦5,000<span class="text-gray-500 font-normal">/day</span></span>
+                                    <input wire:model.live="gpsNavigation" type="checkbox" class="w-5 h-5 rounded border-gray-300 text-[#E3655B] focus:ring-[#E3655B] cursor-pointer">
+                                </div>
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- Section 3: Payment -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-[#9CBF9B]/20 text-[#9CBF9B] text-sm font-bold">3</div>
+                            <h2 class="text-xl font-bold text-gray-900">Payment</h2>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-[#0BA4DB] rounded-lg flex items-center justify-center">
+                                    <span class="text-white font-bold text-lg">P</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900">Pay with Paystack</p>
+                                    <p class="text-sm text-gray-500">Secure payment powered by Paystack</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <div class="mb-6">
+                            <label class="text-sm font-semibold text-gray-700 block mb-2">Additional Notes (Optional)</label>
+                            <textarea wire:model="notes" rows="2" 
+                                class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-[#E3655B] focus:border-[#E3655B] transition-all"
+                                placeholder="Any special requests..."></textarea>
+                        </div>
+
+                        <div class="flex items-center gap-3 mb-6">
+                            <input wire:model="agreedToTerms" type="checkbox" id="terms" 
+                                class="w-5 h-5 rounded border-gray-300 text-[#E3655B] focus:ring-[#E3655B] cursor-pointer">
+                            <label class="text-sm text-gray-600 cursor-pointer" for="terms">
+                                I agree to the <a class="text-[#E3655B] hover:underline" href="#">Terms of Service</a> and <a class="text-[#E3655B] hover:underline" href="#">Privacy Policy</a>.
+                            </label>
+                        </div>
+                        @error('agreedToTerms') <p class="text-red-500 text-xs mb-4">{{ $message }}</p> @enderror
+
+                        <button wire:click="confirmBooking" 
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50"
+                                class="w-full h-14 bg-[#E3655B] hover:opacity-90 text-white text-lg font-bold rounded-xl shadow-lg shadow-[#E3655B]/30 transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                            <span class="material-symbols-outlined" wire:loading.remove>lock</span>
+                            <span wire:loading.remove>Confirm & Pay ₦{{ number_format($this->grandTotal) }}</span>
+                            <span wire:loading>Processing...</span>
+                        </button>
+                        <p class="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-sm">security</span>
+                            Payments are secured with 256-bit SSL encryption
+                        </p>
+                    </section>
+                </div>
+
+                <!-- Right Column: Vehicle Summary (Sticky Sidebar) -->
+                <div class="lg:w-[380px] min-w-[320px] shrink-0">
+                    <div class="sticky top-24 flex flex-col gap-6">
+                        @if($this->vehicle)
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <!-- Vehicle Image -->
+                                <div class="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-6">
+                                    @if($this->vehicle->primary_image_url)
+                                        <img alt="{{ $this->vehicle->make }} {{ $this->vehicle->model }}" 
+                                             class="w-full h-full object-contain drop-shadow-xl" 
+                                             src="{{ $this->vehicle->primary_image_url }}">
+                                    @else
+                                        <span class="material-symbols-outlined text-gray-400 text-6xl">directions_car</span>
+                                    @endif
+                                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-gray-800 border border-[#CFD186]">Premium</div>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-gray-900">{{ $this->vehicle->make }} {{ $this->vehicle->model }}</h3>
+                                            <p class="text-sm text-gray-500">{{ $this->vehicle->year }} • {{ $this->vehicle->transmission?->label() ?? 'Auto' }}</p>
+                                        </div>
+                                        <div class="flex gap-1 text-gray-400">
+                                            <span class="material-symbols-outlined" title="{{ $this->vehicle->seats ?? 5 }} Seats">group</span>
+                                            <span class="text-xs font-medium self-center">{{ $this->vehicle->seats ?? 5 }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Location & Dates -->
+                                    <div class="space-y-4 relative pb-6 border-b border-gray-200 border-dashed">
+                                        <div class="flex gap-3">
+                                            <div class="mt-1 text-[#9CBF9B]">
+                                                <span class="material-symbols-outlined text-xl">location_on</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold uppercase text-gray-400 tracking-wider">Location</p>
+                                                <p class="font-bold text-gray-900 text-sm">{{ $this->vehicle->location ?? 'Lagos' }}</p>
+                                                <p class="text-sm text-gray-500">{{ Carbon::parse($startDate)->format('D, M d') }} - {{ Carbon::parse($endDate)->format('D, M d') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Price Breakdown -->
+                                    <div class="py-6 space-y-3">
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">Car Rental Fee ({{ $totalDays }} {{ Str::plural('day', $totalDays) }})</span>
+                                            <span class="font-medium text-gray-900">₦{{ number_format($totalPrice) }}</span>
+                                        </div>
+                                        @if($fullInsurance)
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-600">Full Insurance</span>
+                                                <span class="font-medium text-gray-900">₦{{ number_format(14000 * $totalDays) }}</span>
+                                            </div>
+                                        @endif
+                                        @if($childSeat)
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-600">Child Safety Seat</span>
+                                                <span class="font-medium text-gray-900">₦{{ number_format(8000 * $totalDays) }}</span>
+                                            </div>
+                                        @endif
+                                        @if($gpsNavigation)
+                                            <div class="flex justify-between text-sm">
+                                                <span class="text-gray-600">GPS Navigation</span>
+                                                <span class="font-medium text-gray-900">₦{{ number_format(5000 * $totalDays) }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Total -->
+                                    <div class="pt-4 border-t border-gray-200 flex items-end justify-between">
+                                        <span class="text-gray-500 text-sm font-medium">Total Price</span>
+                                        <div class="text-right">
+                                            <span class="block text-3xl font-black text-gray-900 leading-none">₦{{ number_format($this->grandTotal) }}</span>
+                                            <span class="text-xs text-gray-400">NGN, includes all taxes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Need Help -->
+                            <div class="bg-gray-50 p-4 rounded-xl flex gap-3 items-start border border-gray-200">
+                                <span class="material-symbols-outlined text-[#9CBF9B]">support_agent</span>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900">Need Help?</p>
+                                    <p class="text-xs text-gray-500 mt-1">Call our support team 24/7 at <a class="text-[#E3655B] font-medium hover:underline" href="tel:+2348001234567">+234 800 123 4567</a></p>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Notes -->
-                <div class="mb-8">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Additional Notes (Optional)
-                    </label>
-                    <textarea 
-                        wire:model="notes"
-                        rows="3"
-                        placeholder="Any special requests or notes..."
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
-                    ></textarea>
-                </div>
-
-                <!-- Summary Card -->
-                <div class="bg-[#1E3A5F] text-white rounded-xl p-6 mb-8">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-gray-300 text-sm">Total Amount</p>
-                            <p class="text-3xl font-bold">₦{{ number_format($totalPrice) }}</p>
+        @else
+            <!-- Booking Confirmed - Redirect to Payment -->
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="size-12 rounded-full bg-[#9CBF9B]/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[#9CBF9B]" style="font-size: 28px;">check_circle</span>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-gray-300 text-sm">{{ $totalDays }} {{ Str::plural('day', $totalDays) }}</p>
-                            <p class="font-medium">{{ $this->vehicle?->make }} {{ $this->vehicle?->model }}</p>
+                        <div class="flex flex-col gap-2">
+                            <h1 class="text-3xl font-black leading-tight tracking-[-0.033em]">Booking Created!</h1>
+                            <p class="text-gray-500 text-base max-w-2xl">
+                                Your booking has been created successfully. Please proceed to payment to confirm your reservation.
+                            </p>
                         </div>
                     </div>
+                    @if($booking)
+                        <div class="flex flex-col items-start md:items-end gap-2">
+                            <span class="text-sm text-gray-500 font-medium">Booking Number</span>
+                            <div class="flex items-center justify-center rounded-lg h-10 px-4 bg-gray-100 text-[#E3655B] text-base font-bold border border-gray-200">
+                                #{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
-
-                <!-- Terms -->
-                <div class="mb-8 text-sm text-gray-600">
-                    <p>By confirming this booking, you agree to our terms and conditions. Payment will be required to complete your reservation.</p>
-                </div>
-
-                <div class="flex justify-between">
-                    <button wire:click="previousStep" 
-                            class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        ← Back
-                    </button>
-                    <button wire:click="confirmBooking" 
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50"
-                            class="px-8 py-3 bg-[#FF6B35] text-white font-semibold rounded-lg hover:bg-[#e55a2b] transition flex items-center gap-2">
-                        <span wire:loading.remove>Confirm Booking</span>
-                        <span wire:loading>Processing...</span>
-                    </button>
-                </div>
-            </div>
-        @endif
-
-        <!-- Step 3: Success -->
-        @if($step === 3 && $bookingConfirmed)
-            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 text-center">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-                <p class="text-gray-600 mb-8">Your booking has been successfully created.</p>
 
                 @if($booking)
-                    <div class="bg-gray-50 rounded-xl p-6 text-left mb-8">
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p class="text-gray-500">Booking ID</p>
-                                <p class="font-semibold">#{{ $booking->id }}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">Status</p>
-                                <p class="font-semibold text-amber-600">{{ $booking->status->value }}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">Vehicle</p>
-                                <p class="font-semibold">{{ $this->vehicle?->make }} {{ $this->vehicle?->model }}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">Total</p>
-                                <p class="font-semibold text-[#1E3A5F]">₦{{ number_format($booking->total_price) }}</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8">
-                        <p class="text-amber-800 text-sm">
-                            <strong>Next Step:</strong> Please proceed to make payment to confirm your reservation.
+                        <p class="text-amber-800 text-sm flex items-center gap-2">
+                            <span class="material-symbols-outlined">warning</span>
+                            <strong>Action Required:</strong> Your booking is pending payment. Please complete payment within 30 minutes to secure your reservation.
                         </p>
                     </div>
-                @endif
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    @if($booking && $booking->status->value === 'pending')
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <a href="{{ route('booking.payment', $booking) }}" 
-                           class="px-6 py-3 bg-[#FF6B35] text-white font-semibold rounded-lg hover:bg-[#e55a2b] transition flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                            </svg>
+                           class="px-8 py-4 bg-[#E3655B] text-white font-bold rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2 text-lg shadow-lg shadow-[#E3655B]/30">
+                            <span class="material-symbols-outlined">lock</span>
                             Proceed to Payment
                         </a>
-                    @endif
-                    <a href="{{ route('dashboard') }}" 
-                       class="px-6 py-3 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#152a45] transition"
-                       wire:navigate>
-                        Go to Dashboard
-                    </a>
-                    <a href="{{ route('home') }}" 
-                       class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                       wire:navigate>
-                        Browse More Vehicles
-                    </a>
-                </div>
+                        <a href="{{ route('dashboard') }}" 
+                           class="px-6 py-4 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition flex items-center justify-center gap-2"
+                           wire:navigate>
+                            Go to Dashboard
+                        </a>
+                    </div>
+                @endif
             </div>
         @endif
     </div>

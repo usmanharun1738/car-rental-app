@@ -74,7 +74,7 @@ class PaymentCallbackController extends Controller
                     ]);
                 }
 
-                return redirect()->route('dashboard')
+                return redirect()->route('booking.success', $booking)
                     ->with('success', 'Payment successful! Your booking has been confirmed.');
             } else {
                 // Payment failed

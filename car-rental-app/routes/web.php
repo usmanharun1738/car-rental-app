@@ -24,6 +24,7 @@ Volt::route('/vehicles/{vehicle}', 'pages.vehicles.show')->name('vehicles.show')
 Route::middleware(['auth'])->group(function () {
     Volt::route('/booking/create', 'pages.booking.create')->name('booking.create');
     Volt::route('/booking/{booking}/payment', 'pages.booking.payment')->name('booking.payment');
+    Volt::route('/booking/{booking}/success', 'pages.booking.success')->name('booking.success');
 });
 
 // Customer Dashboard
