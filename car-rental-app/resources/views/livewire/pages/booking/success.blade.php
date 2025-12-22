@@ -213,6 +213,13 @@ new #[Layout('components.layouts.guest')] #[Title('Booking Confirmed - CARTAR')]
                     Print Confirmation
                 </button>
 
+                <!-- Download Receipt -->
+                <a href="{{ route('booking.receipt.download', $booking) }}" 
+                   class="w-full py-3 rounded-lg border border-[#E3655B] text-[#E3655B] font-bold text-sm hover:bg-[#E3655B]/5 transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">download</span>
+                    Download Receipt PDF
+                </a>
+
                 <!-- Back to Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="w-full py-3 rounded-lg bg-[#1E3A5F] text-white font-bold text-sm hover:bg-[#152a45] transition-colors flex items-center justify-center gap-2"

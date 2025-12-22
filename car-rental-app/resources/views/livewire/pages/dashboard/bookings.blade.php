@@ -293,6 +293,12 @@ new #[Layout('components.layouts.dashboard')] #[Title('My Bookings - CARTAR')] c
                                                    wire:navigate>
                                                     View
                                                 </a>
+                                                <span class="text-slate-300">|</span>
+                                                <a href="{{ route('booking.receipt.download', $booking) }}" 
+                                                   class="text-slate-600 font-bold text-xs hover:underline flex items-center gap-1">
+                                                    <span class="material-symbols-outlined text-[14px]">download</span>
+                                                    Receipt
+                                                </a>
                                             @elseif($booking->status === BookingStatus::PENDING)
                                                 <a href="{{ route('booking.payment', $booking) }}" 
                                                    class="text-[#E3655B] font-bold text-xs hover:underline">

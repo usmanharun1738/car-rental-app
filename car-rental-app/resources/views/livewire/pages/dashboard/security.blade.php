@@ -92,18 +92,18 @@ new #[Layout('components.layouts.dashboard')] #[Title('Security Settings - CARTA
                     <form wire:submit="updatePassword" class="flex flex-col gap-5">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Current Password</label>
-                            <input wire:model="currentPassword" type="password" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20 text-sm" placeholder="••••••••">
+                            <input wire:model="currentPassword" type="password" class="w-full py-3 rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20" placeholder="••••••••">
                             @error('currentPassword') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">New Password</label>
-                                <input wire:model="newPassword" type="password" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20 text-sm" placeholder="••••••••">
+                                <input wire:model="newPassword" type="password" class="w-full py-3 rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20" placeholder="••••••••">
                                 @error('newPassword') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Confirm New Password</label>
-                                <input wire:model="newPassword_confirmation" type="password" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20 text-sm" placeholder="••••••••">
+                                <input wire:model="newPassword_confirmation" type="password" class="w-full py-3 rounded-lg border-slate-300 shadow-sm focus:border-[#E3655B] focus:ring focus:ring-[#E3655B]/20" placeholder="••••••••">
                             </div>
                         </div>
                         <div class="pt-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
