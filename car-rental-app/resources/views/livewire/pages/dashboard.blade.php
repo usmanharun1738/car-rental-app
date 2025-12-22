@@ -6,7 +6,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\{Layout, Title, Computed};
 use Carbon\Carbon;
 
-new #[Layout('components.layouts.guest')] #[Title('My Bookings - CARTAR')] class extends Component
+new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] class extends Component
 {
     #[Computed]
     public function bookings()
@@ -21,12 +21,12 @@ new #[Layout('components.layouts.guest')] #[Title('My Bookings - CARTAR')] class
     public function stats()
     {
         $bookings = $this->bookings;
+        $totalSpent = $bookings->where('status', BookingStatus::COMPLETED)->sum('total_price');
         
         return [
-            'total' => $bookings->count(),
-            'pending' => $bookings->where('status', BookingStatus::PENDING)->count(),
-            'confirmed' => $bookings->where('status', BookingStatus::CONFIRMED)->count(),
-            'completed' => $bookings->where('status', BookingStatus::COMPLETED)->count(),
+            'totalSpent' => $totalSpent,
+            'activeRentals' => $bookings->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])->count(),
+            'rewardPoints' => (int) ($totalSpent / 1000) * 10,
         ];
     }
 
@@ -36,294 +36,251 @@ new #[Layout('components.layouts.guest')] #[Title('My Bookings - CARTAR')] class
         return $this->bookings->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])->first();
     }
 
-    public function cancelBooking(int $bookingId): void
+    #[Computed]
+    public function recentBookings()
     {
-        $booking = Booking::where('user_id', auth()->id())->find($bookingId);
-        
-        if ($booking && $booking->status === BookingStatus::PENDING) {
-            $booking->update(['status' => BookingStatus::CANCELLED]);
-            session()->flash('success', 'Booking cancelled successfully.');
-        }
+        return $this->bookings->take(3);
     }
 
     public function getStatusBadge(BookingStatus $status): array
     {
         return match($status) {
-            BookingStatus::PENDING => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'icon' => 'schedule'],
-            BookingStatus::CONFIRMED => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'icon' => 'verified'],
-            BookingStatus::ACTIVE => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'icon' => 'directions_car'],
-            BookingStatus::COMPLETED => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'icon' => 'check_circle'],
-            BookingStatus::CANCELLED => ['bg' => 'bg-red-100', 'text' => 'text-red-700', 'icon' => 'cancel'],
+            BookingStatus::PENDING => ['bg' => 'bg-amber-100', 'text' => 'text-amber-700', 'label' => 'Pending'],
+            BookingStatus::CONFIRMED => ['bg' => 'bg-green-100', 'text' => 'text-green-700', 'label' => 'Confirmed'],
+            BookingStatus::ACTIVE => ['bg' => 'bg-blue-100', 'text' => 'text-blue-700', 'label' => 'Active'],
+            BookingStatus::COMPLETED => ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => 'Completed'],
+            BookingStatus::CANCELLED => ['bg' => 'bg-red-100', 'text' => 'text-red-700', 'label' => 'Cancelled'],
         };
     }
 }; ?>
 
-<div class="min-h-[70vh] bg-[#f6f7f8]">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-[#1E3A5F] to-[#2d5a8a] text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 class="text-3xl font-black tracking-tight">Welcome back, {{ auth()->user()->name }}!</h1>
-                    <p class="text-blue-200 mt-2">Manage your vehicle rentals and track your bookings</p>
+<div class="max-w-5xl mx-auto flex flex-col gap-8">
+    <!-- Welcome Section -->
+    <div class="flex flex-col gap-1">
+        <h2 class="text-2xl font-bold text-[#111418]">Welcome back, {{ auth()->user()->name }}! 👋</h2>
+        <p class="text-slate-500">Here's what's happening with your rentals today.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Stat 1: Total Spent -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-[#9CBF9B]/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium mb-1">Total Spent</p>
+                <h3 class="text-2xl font-bold text-[#111418]">₦{{ number_format($this->stats['totalSpent']) }}</h3>
+            </div>
+            <div class="flex items-center text-[#9CBF9B] text-xs font-bold bg-[#9CBF9B]/10 w-fit px-2 py-1 rounded">
+                <span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                Lifetime
+            </div>
+        </div>
+
+        <!-- Stat 2: Active Rentals -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-[#CFD186]/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium mb-1">Active Rentals</p>
+                <h3 class="text-2xl font-bold text-[#111418]">{{ $this->stats['activeRentals'] }} {{ Str::plural('Car', $this->stats['activeRentals']) }}</h3>
+            </div>
+            @if($this->activeBooking)
+                <div class="text-[#E3655B] text-xs font-medium">
+                    Ends {{ $this->activeBooking->end_time->diffForHumans() }}
                 </div>
-                <a href="{{ route('vehicles.index') }}" 
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition"
-                   wire:navigate>
-                    <span class="material-symbols-outlined">add</span>
-                    New Booking
-                </a>
+            @else
+                <div class="text-slate-400 text-xs font-medium">No active rentals</div>
+            @endif
+        </div>
+
+        <!-- Stat 3: Reward Points -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div>
+                <p class="text-slate-500 text-sm font-medium mb-1">Reward Points</p>
+                <h3 class="text-2xl font-bold text-[#111418]">{{ number_format($this->stats['rewardPoints']) }} pts</h3>
+            </div>
+            <div class="flex items-center text-slate-400 text-xs font-medium">
+                <span class="material-symbols-outlined text-sm mr-1">star</span>
+                Basic Member
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-14 mb-8 relative z-10">
-            <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-[#1E3A5F]/10 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[#1E3A5F]">calendar_month</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Active Rental & Booking History -->
+        <div class="lg:col-span-2 flex flex-col gap-8">
+            <!-- Active Rental Card -->
+            @if($this->activeBooking)
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-white">
+                        <h3 class="font-bold text-lg text-[#111418]">Current Rental</h3>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#9CBF9B]/20 text-[#2C5E2E] border border-[#9CBF9B]/30 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#2C5E2E]"></span> Active
+                        </span>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Total</p>
-                        <p class="text-2xl font-black text-gray-900">{{ $this->stats['total'] }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-amber-600">schedule</span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Pending</p>
-                        <p class="text-2xl font-black text-amber-600">{{ $this->stats['pending'] }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-blue-600">verified</span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Confirmed</p>
-                        <p class="text-2xl font-black text-blue-600">{{ $this->stats['confirmed'] }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-green-600">check_circle</span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Completed</p>
-                        <p class="text-2xl font-black text-green-600">{{ $this->stats['completed'] }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex items-center gap-3">
-                <span class="material-symbols-outlined">check_circle</span>
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-center gap-3">
-                <span class="material-symbols-outlined">error</span>
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if(session('info'))
-            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 flex items-center gap-3">
-                <span class="material-symbols-outlined">info</span>
-                {{ session('info') }}
-            </div>
-        @endif
-
-        <!-- Active Booking Highlight -->
-        @if($this->activeBooking)
-            <div class="mb-8 bg-gradient-to-r from-[#9CBF9B]/20 to-[#CFD186]/20 rounded-2xl p-6 border border-[#9CBF9B]/30">
-                <div class="flex items-center gap-2 text-[#1E3A5F] mb-4">
-                    <span class="material-symbols-outlined">directions_car</span>
-                    <h2 class="font-bold text-lg">Your Active Rental</h2>
-                </div>
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="w-full md:w-48 h-32 rounded-xl overflow-hidden bg-white shadow-sm">
-                        @if($this->activeBooking->vehicle?->primary_image_url)
-                            <img src="{{ $this->activeBooking->vehicle->primary_image_url }}" 
-                                 alt="{{ $this->activeBooking->vehicle->make }}"
-                                 class="w-full h-full object-cover">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                                <span class="material-symbols-outlined text-gray-400 text-4xl">directions_car</span>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-900">
-                            {{ $this->activeBooking->vehicle?->make }} {{ $this->activeBooking->vehicle?->model }}
-                        </h3>
-                        <p class="text-gray-600 mt-1">
-                            {{ $this->activeBooking->start_time->format('M d') }} - {{ $this->activeBooking->end_time->format('M d, Y') }}
-                        </p>
-                        <div class="flex items-center gap-4 mt-3">
-                            @php $badge = $this->getStatusBadge($this->activeBooking->status); @endphp
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold {{ $badge['bg'] }} {{ $badge['text'] }}">
-                                <span class="material-symbols-outlined text-[16px]">{{ $badge['icon'] }}</span>
-                                {{ $this->activeBooking->status->label() }}
-                            </span>
-                            <a href="{{ route('booking.success', $this->activeBooking) }}" 
-                               class="text-[#E3655B] font-semibold text-sm hover:underline flex items-center gap-1">
-                                View Details
-                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        <!-- Bookings List -->
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900">All Bookings</h2>
-            <span class="text-sm text-gray-500">{{ $this->bookings->count() }} {{ Str::plural('booking', $this->bookings->count()) }}</span>
-        </div>
-
-        @if($this->bookings->isEmpty())
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-                <div class="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                    <span class="material-symbols-outlined text-gray-400 text-4xl">calendar_month</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">No Bookings Yet</h3>
-                <p class="text-gray-500 mb-8 max-w-sm mx-auto">You haven't made any bookings yet. Explore our fleet and find your perfect car today!</p>
-                <a href="{{ route('vehicles.index') }}" 
-                   class="inline-flex items-center gap-2 px-8 py-4 bg-[#E3655B] text-white font-bold rounded-xl hover:bg-[#d55549] transition shadow-lg shadow-[#E3655B]/20"
-                   wire:navigate>
-                    <span class="material-symbols-outlined">directions_car</span>
-                    Browse Vehicles
-                </a>
-            </div>
-        @else
-            <div class="space-y-4">
-                @foreach($this->bookings as $booking)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-gray-200 transition-all">
-                        <div class="flex flex-col md:flex-row">
-                            <!-- Vehicle Image -->
-                            <div class="w-full md:w-56 h-40 md:h-auto bg-gray-100 flex-shrink-0 relative">
-                                @if($booking->vehicle?->primary_image_url)
-                                    <img src="{{ $booking->vehicle->primary_image_url }}" 
-                                         alt="{{ $booking->vehicle->make }}"
-                                         class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-gray-400 text-4xl">directions_car</span>
-                                    </div>
-                                @endif
-                                @php $badge = $this->getStatusBadge($booking->status); @endphp
-                                <div class="absolute top-3 left-3">
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold {{ $badge['bg'] }} {{ $badge['text'] }} shadow-sm">
-                                        <span class="material-symbols-outlined text-[14px]">{{ $badge['icon'] }}</span>
-                                        {{ $booking->status->label() }}
-                                    </span>
+                    <div class="p-5 flex flex-col sm:flex-row gap-6">
+                        <div class="w-full sm:w-1/3 aspect-video bg-gray-100 rounded-lg overflow-hidden border border-slate-100 shadow-inner">
+                            @if($this->activeBooking->vehicle?->primary_image_url)
+                                <img src="{{ $this->activeBooking->vehicle->primary_image_url }}" 
+                                     alt="{{ $this->activeBooking->vehicle->make }}"
+                                     class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                    <span class="material-symbols-outlined text-4xl">directions_car</span>
                                 </div>
-                            </div>
-
-                            <!-- Booking Info -->
-                            <div class="flex-1 p-5 md:p-6">
-                                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                                    <div class="flex-1">
-                                        <div class="flex items-start justify-between">
-                                            <div>
-                                                <h3 class="text-lg font-bold text-gray-900">
-                                                    {{ $booking->vehicle?->make }} {{ $booking->vehicle?->model }}
-                                                </h3>
-                                                <p class="text-sm text-gray-500">{{ $booking->vehicle?->year }} • {{ $booking->vehicle?->transmission?->shortLabel() ?? 'Auto' }}</p>
-                                            </div>
-                                            <p class="text-sm text-gray-400 font-medium">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</p>
-                                        </div>
-                                        
-                                        <div class="flex flex-wrap gap-6 mt-4">
-                                            <div class="flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-gray-400 text-[20px]">calendar_today</span>
-                                                <div>
-                                                    <p class="text-xs text-gray-500">Pick-up</p>
-                                                    <p class="font-semibold text-sm">{{ $booking->start_time->format('M d, Y') }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-gray-400 text-[20px]">event</span>
-                                                <div>
-                                                    <p class="text-xs text-gray-500">Return</p>
-                                                    <p class="font-semibold text-sm">{{ $booking->end_time->format('M d, Y') }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-gray-400 text-[20px]">location_on</span>
-                                                <div>
-                                                    <p class="text-xs text-gray-500">Location</p>
-                                                    <p class="font-semibold text-sm">{{ $booking->vehicle?->location ?? 'Lagos' }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                            @endif
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="text-xl font-bold text-[#111418]">
+                                            {{ $this->activeBooking->vehicle?->make }} {{ $this->activeBooking->vehicle?->model }} {{ $this->activeBooking->vehicle?->year }}
+                                        </h4>
+                                        <p class="text-slate-500 text-sm">
+                                            {{ $this->activeBooking->vehicle?->transmission?->label() ?? 'Auto' }} • {{ $this->activeBooking->vehicle?->seats ?? 5 }} Seats
+                                        </p>
                                     </div>
-
-                                    <div class="flex flex-col items-end gap-3">
-                                        <div class="text-right">
-                                            <p class="text-xs text-gray-500">Total</p>
-                                            <p class="text-2xl font-black text-[#1E3A5F]">₦{{ number_format($booking->total_price) }}</p>
-                                        </div>
-                                        
-                                        <div class="flex gap-2">
-                                            @if($booking->status === BookingStatus::PENDING)
-                                                <a href="{{ route('booking.payment', $booking) }}"
-                                                   class="inline-flex items-center gap-1 px-5 py-2.5 bg-[#E3655B] text-white text-sm font-bold rounded-lg hover:bg-[#d55549] transition shadow-sm">
-                                                    <span class="material-symbols-outlined text-[18px]">credit_card</span>
-                                                    Pay Now
-                                                </a>
-                                                <button wire:click="cancelBooking({{ $booking->id }})"
-                                                        wire:confirm="Are you sure you want to cancel this booking?"
-                                                        class="inline-flex items-center gap-1 px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-lg hover:bg-gray-50 transition">
-                                                    Cancel
-                                                </button>
-                                            @elseif($booking->status === BookingStatus::CONFIRMED || $booking->status === BookingStatus::COMPLETED)
-                                                <a href="{{ route('booking.success', $booking) }}"
-                                                   class="inline-flex items-center gap-1 px-5 py-2.5 bg-[#1E3A5F] text-white text-sm font-bold rounded-lg hover:bg-[#152a45] transition">
-                                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                                    View Details
-                                                </a>
-                                            @endif
-                                        </div>
+                                    <p class="font-bold text-[#111418]">₦{{ number_format($this->activeBooking->vehicle?->daily_rate) }}<span class="text-slate-400 text-xs font-normal">/day</span></p>
+                                </div>
+                                <div class="flex gap-4 mt-4 mb-4">
+                                    <div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
+                                        <p class="text-xs text-slate-400 font-medium uppercase">Pick-up</p>
+                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->activeBooking->vehicle?->location ?? 'Lagos' }}</p>
+                                        <p class="text-xs text-slate-500 mt-1">{{ $this->activeBooking->start_time->format('M d, h:i A') }}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
+                                        <p class="text-xs text-slate-400 font-medium uppercase">Drop-off</p>
+                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->activeBooking->vehicle?->location ?? 'Lagos' }}</p>
+                                        <p class="text-xs text-slate-500 mt-1">{{ $this->activeBooking->end_time->format('M d, h:i A') }}</p>
                                     </div>
                                 </div>
                             </div>
+                            <div class="flex gap-3 mt-2">
+                                <a href="{{ route('booking.success', $this->activeBooking) }}" 
+                                   class="flex-1 bg-[#111418] text-white text-sm font-bold py-2.5 rounded-lg hover:bg-slate-800 transition-colors text-center"
+                                   wire:navigate>
+                                    View Details
+                                </a>
+                            </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        @endif
+                </div>
+            @endif
 
-        <!-- Quick Actions -->
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('vehicles.index') }}" 
-               class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#E3655B] text-white font-bold rounded-xl hover:bg-[#d55549] transition shadow-lg shadow-[#E3655B]/20"
-               wire:navigate>
-                <span class="material-symbols-outlined">directions_car</span>
-                Browse Vehicles
-            </a>
-            <a href="{{ route('home') }}" 
-               class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition"
-               wire:navigate>
-                <span class="material-symbols-outlined">home</span>
-                Back to Home
-            </a>
+            <!-- Recent Booking History Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="flex items-center justify-between p-5 border-b border-slate-100">
+                    <h3 class="font-bold text-lg text-[#111418]">Booking History</h3>
+                    <a href="{{ route('dashboard.bookings') }}" class="text-sm font-semibold text-[#E3655B] hover:underline" wire:navigate>View All</a>
+                </div>
+                @if($this->recentBookings->isEmpty())
+                    <div class="p-8 text-center">
+                        <span class="material-symbols-outlined text-slate-300 text-4xl mb-3">calendar_month</span>
+                        <p class="text-slate-500">No bookings yet</p>
+                    </div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold">Car Model</th>
+                                    <th class="px-6 py-3 font-semibold">Date</th>
+                                    <th class="px-6 py-3 font-semibold">Cost</th>
+                                    <th class="px-6 py-3 font-semibold">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach($this->recentBookings as $booking)
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-[#111418]">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-md bg-gray-100 overflow-hidden">
+                                                    @if($booking->vehicle?->primary_image_url)
+                                                        <img src="{{ $booking->vehicle->primary_image_url }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        <div class="w-full h-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-gray-400 text-sm">directions_car</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                {{ $booking->vehicle?->make }} {{ $booking->vehicle?->model }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-500">{{ $booking->start_time->format('M d, Y') }}</td>
+                                        <td class="px-6 py-4 font-medium text-[#111418]">₦{{ number_format($booking->total_price) }}</td>
+                                        <td class="px-6 py-4">
+                                            @php $badge = $this->getStatusBadge($booking->status); @endphp
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badge['bg'] }} {{ $badge['text'] }}">
+                                                {{ $badge['label'] }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Right Column: Quick Links & Profile -->
+        <div class="lg:col-span-1 flex flex-col gap-8">
+            <!-- Profile Completion -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <h4 class="font-bold text-[#111418] mb-4">Complete your profile</h4>
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="size-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-sm">check</span>
+                        </div>
+                        <p class="text-sm text-slate-600 line-through decoration-slate-400">Verify Email Address</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="size-6 rounded-full {{ auth()->user()->phone ? 'bg-green-100 text-green-600' : 'border border-dashed border-slate-300 text-slate-400' }} flex items-center justify-center shrink-0">
+                            @if(auth()->user()->phone)
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            @endif
+                        </div>
+                        <p class="text-sm {{ auth()->user()->phone ? 'text-slate-600 line-through decoration-slate-400' : 'text-[#111418] font-medium' }}">Add Phone Number</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="size-6 rounded-full border border-dashed border-slate-300 text-slate-400 flex items-center justify-center shrink-0">
+                        </div>
+                        <p class="text-sm text-[#111418] font-medium">Complete First Booking</p>
+                    </div>
+                    <a href="{{ route('dashboard.profile') }}" 
+                       class="mt-2 w-full py-2 border border-slate-200 rounded-lg text-sm font-bold text-[#111418] hover:bg-slate-50 transition-colors text-center"
+                       wire:navigate>
+                        Update Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Promotion Card -->
+            <div class="bg-[#CFD186]/20 rounded-xl border border-[#CFD186]/30 p-6 flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm">
+                    <span class="material-symbols-outlined text-[#E3655B] text-3xl">celebration</span>
+                </div>
+                <h4 class="font-bold text-[#111418] mb-1">Invite Friends</h4>
+                <p class="text-sm text-slate-600 mb-4">Earn ₦5,000 credit for every friend who rents a car.</p>
+                <button class="text-[#E3655B] text-sm font-bold hover:underline">Copy Invite Link</button>
+            </div>
+
+            <!-- Need Help -->
+            <div class="bg-[#101922] rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+                <div class="absolute right-0 bottom-0 w-32 h-32 bg-[#E3655B] rounded-full opacity-10 blur-2xl translate-x-10 translate-y-10"></div>
+                <div class="relative z-10">
+                    <div class="size-10 bg-white/10 rounded-lg flex items-center justify-center mb-4 backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-[#CFD186]">support_agent</span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Need help?</h4>
+                    <p class="text-slate-400 text-sm mb-4">Our support team is available 24/7 to assist you.</p>
+                    <a href="tel:+2348001234567" class="w-full bg-white text-[#111418] py-2.5 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors block text-center">
+                        Contact Support
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

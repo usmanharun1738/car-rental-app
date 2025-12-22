@@ -27,6 +27,7 @@ class User extends Authenticatable
         'address',
         'license_number',
         'license_image_url',
+        'profile_photo_path',
     ];
 
     /**
@@ -64,5 +65,39 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the user's bookings
+     */
+    public function bookings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Get the user's driver license
+     */
+    public function driverLicense(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DriverLicense::class);
+    }
+
+    /**
+     * Check if the user has a verified license
+     */
+    public function hasVerifiedLicense(): bool
+    {
+        return $this->driverLicense?->isValid() ?? false;
+    }
+
+    /**
+     * Get the profile photo URL
+     */
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_photo_path 
+            ? \Illuminate\Support\Facades\Storage::url($this->profile_photo_path)
+            : null;
     }
 }

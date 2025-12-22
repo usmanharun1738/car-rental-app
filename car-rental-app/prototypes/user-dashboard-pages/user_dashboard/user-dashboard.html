@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CARTAR - User Dashboard</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            // Mapping brand colors to theme names for easier usage
+            "primary": "#E3655B", // Salmon Red - Primary Action
+            "secondary": "#9CBF9B", // Sage Green - Success/Secondary
+            "accent": "#CFD186", // Yellowish - Highlights
+            "background-light": "#f8fafc",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    /* Custom Scrollbar for cleaner look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    
+    .sidebar-active-link {
+      background-color: #EBF5EB; /* Very light green based on #9CBF9B */
+      color: #111418;
+      border-right: 3px solid #E3655B;
+    }
+    .sidebar-link:hover:not(.sidebar-active-link) {
+      background-color: #f1f5f9;
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light text-slate-900 overflow-hidden h-screen flex">
+<!-- Sidebar -->
+<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-full overflow-y-auto hidden md:flex">
+<!-- Logo Area -->
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-[#E3655B] flex items-center justify-center text-white font-black text-xl shadow-md">
+        C
+      </div>
+<h1 class="text-xl font-extrabold tracking-tight text-[#111418]">CARTAR</h1>
+</div>
+<!-- User Snippet -->
+<div class="px-6 pb-6">
+<div class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 flex-shrink-0" data-alt="Portrait of a smiling Nigerian man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBn90A1w9uYFx2UXzaBtP28IfDWmmfx09R0XmSsm_dFBxAnMxs1uz8aE4U2znAI8UwhP8G4_krc9ZE3YAlpavGjC5kRx4qeQHdq3Hk0J71UUbDCBoZ6c8uyZqfAqFGkrYT7IDj_M9a8-a73FTzEcBY6A-R2f8WlPYpE5qDl_UDuWev2CAWyOWJW4OERcmkn_8O0OMXRvQinKmA494_8AiabTkG0iFbHbkhu-dyWc0EAiE7VlEDHOYBWiiyNDLOsRlzwc3aOAw7GLid7");'></div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-[#111418] text-sm font-bold truncate">Chinedu Okafor</p>
+<p class="text-slate-500 text-xs truncate">Basic Member</p>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 px-4 flex flex-col gap-1">
+<p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-2">Menu</p>
+<a class="sidebar-active-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[#E3655B]" style="font-size: 20px;">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">person</span>
+<span class="text-sm font-medium">User Profile</span>
+</a>
+<a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+<span class="text-sm font-medium">My Bookings</span>
+</a>
+<a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">security</span>
+<span class="text-sm font-medium">Security</span>
+</a>
+<a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">badge</span>
+<span class="text-sm font-medium">Driver's License</span>
+</a>
+</nav>
+<!-- Bottom Actions -->
+<div class="p-4 border-t border-slate-200">
+<button class="flex w-full cursor-pointer items-center justify-start gap-3 rounded-lg h-10 px-4 text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
+<span class="text-sm font-medium">Log Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Mobile Header -->
+<header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:hidden">
+<div class="flex items-center gap-2">
+<div class="size-8 rounded bg-[#E3655B] flex items-center justify-center text-white font-bold">C</div>
+<span class="font-bold text-lg">CARTAR</span>
+</div>
+<button class="text-slate-600">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Desktop Header / Top Bar -->
+<header class="hidden md:flex h-20 items-center justify-between px-8 bg-white border-b border-slate-200 flex-shrink-0">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-sm">
+<span class="text-slate-500 font-medium">Home</span>
+<span class="text-slate-300">/</span>
+<span class="text-[#111418] font-medium">Dashboard</span>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="absolute top-0 right-0 size-2 bg-red-500 rounded-full border border-white"></span>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<button class="bg-[#E3655B] hover:bg-[#d6554b] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">directions_car</span>
+          Book a Car
+        </button>
+</div>
+</header>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+<div class="max-w-5xl mx-auto flex flex-col gap-8">
+<!-- Welcome Section -->
+<div class="flex flex-col gap-1">
+<h2 class="text-2xl font-bold text-[#111418]">Welcome back, Chinedu! 👋</h2>
+<p class="text-slate-500">Here's what's happening with your rentals today.</p>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat 1 -->
+<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-[#9CBF9B]/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1">Total Spent</p>
+<h3 class="text-2xl font-bold text-[#111418]">₦450,000</h3>
+</div>
+<div class="flex items-center text-[#9CBF9B] text-xs font-bold bg-[#9CBF9B]/10 w-fit px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+              +12% this month
+            </div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-[#CFD186]/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1">Active Rentals</p>
+<h3 class="text-2xl font-bold text-[#111418]">1 Car</h3>
+</div>
+<div class="text-[#E3655B] text-xs font-medium">
+              Ends in 2 days
+            </div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div>
+<p class="text-slate-500 text-sm font-medium mb-1">Reward Points</p>
+<h3 class="text-2xl font-bold text-[#111418]">1,250 pts</h3>
+</div>
+<div class="flex items-center text-slate-400 text-xs font-medium">
+<span class="material-symbols-outlined text-sm mr-1">star</span>
+              Gold Tier Member
+            </div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Active Rental & Profile -->
+<div class="lg:col-span-2 flex flex-col gap-8">
+<!-- Active Rental Card -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-5 border-b border-slate-100 bg-white">
+<h3 class="font-bold text-lg text-[#111418]">Current Rental</h3>
+<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#9CBF9B]/20 text-[#2C5E2E] border border-[#9CBF9B]/30 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2C5E2E]"></span> Active
+                </span>
+</div>
+<div class="p-5 flex flex-col sm:flex-row gap-6">
+<div class="w-full sm:w-1/3 aspect-video bg-gray-100 rounded-lg bg-cover bg-center border border-slate-100 shadow-inner" data-alt="Silver Toyota Camry parked on a Lagos street" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAjIrq7-M3BsGo5YyOEMn1NhPcOZj30p-H8B9i-5MGiQYAlks-KUj_ukbdPnXAUGTfh_ZfTAlILR_OU2cAkjlaqMeFJlQWC_Pj3HLh36SxGQpk4TPGEsUoDMduT7HQYD0cogZ1WYveksIdB4_W4yka8yyKGStF1jv508lbOoh3FT7N_DGBWxlHA-Txt1gidMiRjulYrs15IIwSWHmkLY4qwbmHRZe7WiCePGYes49es7cdQD3YKqGCEqDiX4GtzeqHm69mY3v35idr8");'></div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="text-xl font-bold text-[#111418]">Toyota Camry 2022</h4>
+<p class="text-slate-500 text-sm">Sedan • Automatic • 5 Seats</p>
+</div>
+<p class="font-bold text-[#111418]">₦35k<span class="text-slate-400 text-xs font-normal">/day</span></p>
+</div>
+<div class="flex gap-4 mt-4 mb-4">
+<div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
+<p class="text-xs text-slate-400 font-medium uppercase">Pick-up</p>
+<p class="text-sm font-semibold text-[#111418] mt-1">Lekki Phase 1</p>
+<p class="text-xs text-slate-500 mt-1">Oct 12, 10:00 AM</p>
+</div>
+<div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
+<p class="text-xs text-slate-400 font-medium uppercase">Drop-off</p>
+<p class="text-sm font-semibold text-[#111418] mt-1">Ikeja Airport</p>
+<p class="text-xs text-slate-500 mt-1">Oct 15, 10:00 AM</p>
+</div>
+</div>
+</div>
+<div class="flex gap-3 mt-2">
+<button class="flex-1 bg-[#111418] text-white text-sm font-bold py-2.5 rounded-lg hover:bg-slate-800 transition-colors">Track Location</button>
+<button class="flex-1 bg-white border border-slate-200 text-[#111418] text-sm font-bold py-2.5 rounded-lg hover:bg-slate-50 transition-colors">Extend Rental</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+<div class="flex items-center justify-between p-5 border-b border-slate-100">
+<h3 class="font-bold text-lg text-[#111418]">Booking History</h3>
+<a class="text-sm font-semibold text-[#E3655B] hover:underline" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+<tr>
+<th class="px-6 py-3 font-semibold">Car Model</th>
+<th class="px-6 py-3 font-semibold">Date</th>
+<th class="px-6 py-3 font-semibold">Cost</th>
+<th class="px-6 py-3 font-semibold">Status</th>
+<th class="px-6 py-3 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4 font-medium text-[#111418]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-md bg-cover bg-center bg-gray-100" data-alt="Small thumbnail of a Honda Civic" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGSO2fI9cqRX0UFiYrOLPqrqFoOkQXcDG6AhBdTw8NgELNjnwb6_KywJySDPqSTti-in7WOdLBr4-PaHvCXqDmXbvyyOzodamZ06sbl0kNSBE2ULlB4Zdj8RWAlei6EeZDhDh3gMLXoTLBQzG2czWxpicHwGu3R_vm7hfRRi0m-MAQfTek8IehYTwrtNjfclHhnC9PpTYV-DowUxFbDHVSA13fSGruyTBXM_6szzAOKYtS6EnQ7YBPiIQ6kYIavGrvcY6jK2im3axc");'></div>
+                          Honda Civic
+                        </div>
+</td>
+<td class="px-6 py-4 text-slate-500">Sept 28, 2023</td>
+<td class="px-6 py-4 font-medium text-[#111418]">₦45,000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completed
+                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-[#111418]">
+<span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4 font-medium text-[#111418]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-md bg-cover bg-center bg-gray-100" data-alt="Small thumbnail of a Lexus SUV" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCRGK0Our8zNtYT4EnDW9a-dsr12M1bcK7KTPS_T4zspmzHC0-UF-sAg8oqInQ602z8Svg9UwNKN0d5JgyW0uXZl05m_swD3QmdlzF5PlnnAB3O9Mo84B5gZI5SzDbVaw32RDcJu1or3xJkrCWALstzSz37j5BOnI0PtvU-8PSH0T82Bx-DqSihx3nli2gvHligzjDeIc1xUqvblwD_75e2KWCCjlXxND68VUKnqGhIlpOdWfzCM4VJRB9wfCFMGr7iePRfDqMz7b7M");'></div>
+                           Lexus RX 350
+                        </div>
+</td>
+<td class="px-6 py-4 text-slate-500">Aug 15, 2023</td>
+<td class="px-6 py-4 font-medium text-[#111418]">₦120,000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completed
+                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-[#111418]">
+<span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="px-6 py-4 font-medium text-[#111418]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-md bg-cover bg-center bg-gray-100" data-alt="Small thumbnail of a Ford Explorer" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGMXNyIGVJfzrmnRb5_N4vvhy6PMCQfEO55iLebx-415CYSMWBHvdIFMLyFAnduPnHQ2rb8_Vlvrw1hqfPl-D4CjQSNBlboQITm9GWvzrLTrZbHyoxHvT2K7PJk5ivsRPJKrqgHNtU0w5I8Wsdtymi5FXFtBgetN7CV_6etJzgPJzLoIwtWk_Ly9uT_0kHv2xQh6-lmxEo9zR6zGaFPwF4bZmXfogBREsHMGRzm8S-s8jG61hy1f_nsGcz7D0WKl6rJGbiqdZ2oV_2");'></div>
+                           Ford Explorer
+                        </div>
+</td>
+<td class="px-6 py-4 text-slate-500">July 02, 2023</td>
+<td class="px-6 py-4 font-medium text-[#111418]">₦0.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Cancelled
+                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-[#111418]">
+<span class="material-symbols-outlined text-base">visibility_off</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Verification & Profile Summary -->
+<div class="lg:col-span-1 flex flex-col gap-8">
+<!-- License Verification Status -->
+<div class="bg-gradient-to-br from-[#101922] to-[#2C3E50] rounded-xl p-6 text-white shadow-md relative overflow-hidden">
+<div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-[#E3655B] rounded-full opacity-20 blur-xl"></div>
+<div class="relative z-10">
+<div class="flex items-start justify-between mb-4">
+<div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-[#CFD186]">verified_user</span>
+</div>
+<span class="bg-[#9CBF9B] text-[#111418] text-xs font-bold px-2 py-1 rounded">Verified</span>
+</div>
+<h4 class="text-lg font-bold mb-1">Driver's License</h4>
+<p class="text-slate-400 text-sm mb-4">Valid until Dec 2025</p>
+<div class="h-1 w-full bg-white/10 rounded-full mb-2">
+<div class="h-full bg-[#9CBF9B] rounded-full" style="width: 100%"></div>
+</div>
+<p class="text-xs text-slate-400 text-right">Verification Complete</p>
+</div>
+</div>
+<!-- Profile Completion -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+<h4 class="font-bold text-[#111418] mb-4">Complete your profile</h4>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="size-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<p class="text-sm text-slate-600 line-through decoration-slate-400">Verify Email Address</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<p class="text-sm text-slate-600 line-through decoration-slate-400">Add Phone Number</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-6 rounded-full border border-dashed border-slate-300 text-slate-400 flex items-center justify-center shrink-0">
+</div>
+<p class="text-sm text-[#111418] font-medium">Add Emergency Contact</p>
+</div>
+<button class="mt-2 w-full py-2 border border-slate-200 rounded-lg text-sm font-bold text-[#111418] hover:bg-slate-50 transition-colors">
+                  Update Profile
+                </button>
+</div>
+</div>
+<!-- Promotion Card -->
+<div class="bg-[#CFD186]/20 rounded-xl border border-[#CFD186]/30 p-6 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm">
+<span class="material-symbols-outlined text-[#E3655B] text-3xl">celebration</span>
+</div>
+<h4 class="font-bold text-[#111418] mb-1">Invite Friends</h4>
+<p class="text-sm text-slate-600 mb-4">Earn ₦5,000 credit for every friend who rents a car.</p>
+<button class="text-[#E3655B] text-sm font-bold hover:underline">Copy Invite Link</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

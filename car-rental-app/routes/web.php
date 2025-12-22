@@ -28,9 +28,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Customer Dashboard
-Volt::route('dashboard', 'pages.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Volt::route('dashboard', 'pages.dashboard')->name('dashboard');
+    Volt::route('dashboard/bookings', 'pages.dashboard.bookings')->name('dashboard.bookings');
+    Volt::route('dashboard/profile', 'pages.dashboard.profile')->name('dashboard.profile');
+    Volt::route('dashboard/security', 'pages.dashboard.security')->name('dashboard.security');
+    Volt::route('dashboard/license', 'pages.dashboard.license')->name('dashboard.license');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
