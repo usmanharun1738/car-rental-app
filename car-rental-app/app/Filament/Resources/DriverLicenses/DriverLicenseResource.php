@@ -25,6 +25,8 @@ class DriverLicenseResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $recordTitleAttribute = 'license_number';
 
     public static function table(Table $table): Table
