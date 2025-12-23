@@ -368,11 +368,6 @@ new #[Layout('components.layouts.guest')] #[Title('Available Vehicles - CARTAR')
                                             Best Value
                                         </div>
                                     @endif
-                                    
-                                    <!-- Favorite Button -->
-                                    <button class="absolute top-3 right-3 p-2 bg-white/50 hover:bg-white rounded-full text-gray-600 hover:text-[#FF6B35] transition-colors backdrop-blur-sm">
-                                        <span class="material-symbols-outlined text-base leading-none">favorite</span>
-                                    </button>
                                 </div>
 
                                 <!-- Vehicle Info -->

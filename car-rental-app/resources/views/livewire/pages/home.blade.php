@@ -41,10 +41,49 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                 Premium rentals at unbeatable prices. Choose from our wide range of vehicles for your next adventure.
             </p>
         </div>
-        
-        <!-- Search Form -->
-        <div class="container mx-auto px-4 lg:px-20 relative z-10 mt-8">
-            <div class="bg-white rounded-xl shadow-xl p-6 lg:p-8 max-w-5xl mx-auto border border-gray-100">
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-16 px-4 md:px-10 bg-white">
+        <div class="max-w-[1200px] mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-gray-900 text-3xl font-bold leading-tight mb-3">How it works</h2>
+                <p class="text-gray-500 text-base">Simple and fast. Get on the road in minutes.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
+                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">calendar_add_on</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Book your car</h3>
+                    <p class="text-gray-500 text-sm">Choose your perfect car and book it online instantly with our secure platform.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
+                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">car_rental</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Pick up</h3>
+                    <p class="text-gray-500 text-sm">Pick up your car at one of our many locations or get it delivered to you.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
+                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">directions_car</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Drive away</h3>
+                    <p class="text-gray-500 text-sm">Hit the road and enjoy your trip. We've got you covered with 24/7 support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Vehicles with Search -->
+    <section id="vehicles" class="py-16 px-4 md:px-10 bg-gray-50">
+        <div class="max-w-[1200px] mx-auto">
+            <!-- Search Form -->
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-10 border border-gray-100">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
                     <!-- Location -->
                     <div class="lg:col-span-1">
@@ -84,54 +123,14 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
                     
                     <!-- Search Button -->
                     <div class="lg:col-span-1">
-                        <a href="#vehicles" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-[#FF6B35] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#e55a2b] shadow-lg shadow-orange-500/30 transition-all transform active:scale-95">
+                        <button wire:click="$refresh" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-[#FF6B35] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#e55a2b] shadow-lg shadow-orange-500/30 transition-all transform active:scale-95">
                             <span class="truncate">Search Cars</span>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- How It Works -->
-    <section class="py-16 px-4 md:px-10 bg-white">
-        <div class="max-w-[1200px] mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-gray-900 text-3xl font-bold leading-tight mb-3">How it works</h2>
-                <p class="text-gray-500 text-base">Simple and fast. Get on the road in minutes.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Step 1 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">calendar_add_on</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Book your car</h3>
-                    <p class="text-gray-500 text-sm">Choose your perfect car and book it online instantly with our secure platform.</p>
-                </div>
-                <!-- Step 2 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">car_rental</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Pick up</h3>
-                    <p class="text-gray-500 text-sm">Pick up your car at one of our many locations or get it delivered to you.</p>
-                </div>
-                <!-- Step 3 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">directions_car</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Drive away</h3>
-                    <p class="text-gray-500 text-sm">Hit the road and enjoy your trip. We've got you covered with 24/7 support.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Popular Vehicles -->
-    <section id="vehicles" class="py-16 px-4 md:px-10 bg-gray-50">
-        <div class="max-w-[1200px] mx-auto">
+            <!-- Section Header -->
             <div class="flex justify-between items-end mb-10">
                 <div>
                     <h2 class="text-gray-900 text-3xl font-bold leading-tight mb-2">Popular Vehicles</h2>
@@ -151,41 +150,70 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($vehicles as $vehicle)
-                        <div class="group flex flex-col gap-4 rounded-xl bg-white shadow-sm hover:shadow-md transition-all border border-transparent hover:border-[#FF6B35]/20 p-4">
+                        <div class="group bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#FF6B35]/30 transition-all duration-300 flex flex-col">
                             <!-- Vehicle Image -->
-                            <div class="aspect-[4/3] w-full rounded-lg bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                            <div class="relative aspect-[4/3] bg-gray-50 overflow-hidden">
                                 @if($vehicle->primary_image_url)
                                     <img 
                                         src="{{ $vehicle->primary_image_url }}" 
                                         alt="{{ $vehicle->make }} {{ $vehicle->model }}"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     >
                                 @else
-                                    <span class="material-symbols-outlined text-gray-400 text-5xl">directions_car</span>
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-gray-400 text-6xl">directions_car</span>
+                                    </div>
                                 @endif
-                                <!-- Status Badge -->
-                                <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-900">
-                                    {{ $vehicle->year }}
-                                </div>
                             </div>
-                            
+
                             <!-- Vehicle Info -->
-                            <div class="flex flex-col gap-1">
-                                <h3 class="text-gray-900 text-lg font-bold">{{ $vehicle->make }} {{ $vehicle->model }}</h3>
-                                <p class="text-gray-500 text-sm">{{ $vehicle->transmission?->shortLabel() ?? 'Auto' }} • {{ $vehicle->seats ?? 5 }} Seats</p>
-                            </div>
-                            
-                            <!-- Price & CTA -->
-                            <div class="mt-auto flex items-center justify-between pt-2 border-t border-gray-100">
-                                <p class="text-[#FF6B35] text-lg font-bold">
-                                    ₦{{ number_format($vehicle->daily_rate) }}
-                                    <span class="text-xs text-gray-400 font-normal">/day</span>
-                                </p>
-                                <a href="{{ route('vehicles.show', $vehicle) }}" 
-                                   class="text-sm font-bold text-[#1E3A5F] hover:text-[#FF6B35] transition-colors"
-                                   wire:navigate>
-                                    Rent Now
-                                </a>
+                            <div class="p-5 flex flex-col flex-1">
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="text-lg font-bold text-gray-900">{{ $vehicle->make }} {{ $vehicle->model }}</h3>
+                                        <div class="flex items-center gap-1 text-xs font-bold bg-[#FF6B35]/20 text-[#FF6B35] px-2 py-1 rounded">
+                                            {{ $vehicle->average_rating > 0 ? number_format($vehicle->average_rating, 1) : '4.8' }} <span class="material-symbols-outlined text-xs">star</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-500">{{ $vehicle->year }}</p>
+                                </div>
+
+                                <!-- Features Grid -->
+                                <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <span class="material-symbols-outlined text-lg text-gray-400">person</span>
+                                        <span>{{ $vehicle->seats ?? 5 }} Seats</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <span class="material-symbols-outlined text-lg text-gray-400">settings</span>
+                                        <span>{{ $vehicle->transmission?->shortLabel() ?? 'Auto' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <span class="material-symbols-outlined text-lg text-gray-400">{{ $vehicle->fuel_type?->icon() ?? 'local_gas_station' }}</span>
+                                        <span>{{ $vehicle->fuel_type?->label() ?? 'Petrol' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                                        <span class="material-symbols-outlined text-lg text-gray-400">speed</span>
+                                        <span>{{ $vehicle->mileage == 0 || !$vehicle->mileage ? 'Unlimited' : $vehicle->mileage . 'km' }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Price & CTA -->
+                                <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                                    <div>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-xl font-bold text-gray-900">₦{{ number_format($vehicle->daily_rate) }}</span>
+                                            <span class="text-xs text-gray-500">/ day</span>
+                                        </div>
+                                    </div>
+                                    <a 
+                                        href="{{ route('vehicles.show', $vehicle) }}"
+                                        class="bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors shadow-sm hover:shadow-md"
+                                        wire:navigate
+                                    >
+                                        View Deal
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @endforeach

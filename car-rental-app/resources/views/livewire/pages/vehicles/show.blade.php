@@ -1,12 +1,16 @@
 <?php
 
 use App\Models\Vehicle;
+use App\Models\Review;
+use App\Models\Booking;
 use App\Enums\VehicleStatus;
+use App\Enums\BookingStatus;
 use App\Actions\Bookings\CheckVehicleAvailabilityAction;
 use App\Actions\Bookings\CalculateBookingPriceAction;
 use Livewire\Volt\Component;
 use Livewire\Attributes\{Layout, Title};
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 new #[Layout('components.layouts.guest')] class extends Component
 {
@@ -19,6 +23,12 @@ new #[Layout('components.layouts.guest')] class extends Component
     public bool $isAvailable = false;
     public bool $includeInsurance = false;
     public int $rentalDays = 1;
+    
+    // Review form properties
+    public bool $showReviewForm = false;
+    public int $reviewRating = 5;
+    public string $reviewTitle = '';
+    public string $reviewComment = '';
 
     public function mount(Vehicle $vehicle): void
     {
@@ -28,6 +38,109 @@ new #[Layout('components.layouts.guest')] class extends Component
         $this->startDate = now()->addDay()->format('Y-m-d');
         $this->endDate = now()->addDays(4)->format('Y-m-d');
         $this->calculateDays();
+    }
+    
+    public function getReviewsProperty(): Collection
+    {
+        return $this->vehicle->reviews()
+            ->approved()
+            ->with('user')
+            ->latest()
+            ->take(10)
+            ->get();
+    }
+    
+    public function getAverageRatingProperty(): float
+    {
+        $avg = $this->vehicle->reviews()->approved()->avg('rating');
+        return $avg ? round($avg, 1) : 0;
+    }
+    
+    public function getReviewCountProperty(): int
+    {
+        return $this->vehicle->reviews()->approved()->count();
+    }
+    
+    public function getRatingDistributionProperty(): array
+    {
+        $total = $this->reviewCount;
+        if ($total === 0) {
+            return [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        }
+        
+        $distribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $count = $this->vehicle->reviews()->approved()->where('rating', $i)->count();
+            $distribution[$i] = round(($count / $total) * 100);
+        }
+        return $distribution;
+    }
+    
+    public function getCanLeaveReviewProperty(): bool
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+        
+        // Check if user has completed booking for this vehicle without a review
+        return Booking::where('user_id', auth()->id())
+            ->where('vehicle_id', $this->vehicle->id)
+            ->where('status', BookingStatus::COMPLETED)
+            ->whereDoesntHave('review')
+            ->exists();
+    }
+    
+    public function getEligibleBookingProperty(): ?Booking
+    {
+        if (!auth()->check()) {
+            return null;
+        }
+        
+        return Booking::where('user_id', auth()->id())
+            ->where('vehicle_id', $this->vehicle->id)
+            ->where('status', BookingStatus::COMPLETED)
+            ->whereDoesntHave('review')
+            ->first();
+    }
+    
+    public function toggleReviewForm(): void
+    {
+        $this->showReviewForm = !$this->showReviewForm;
+    }
+    
+    public function submitReview(): void
+    {
+        if (!$this->canLeaveReview) {
+            return;
+        }
+        
+        $this->validate([
+            'reviewRating' => 'required|integer|min:1|max:5',
+            'reviewTitle' => 'required|string|max:100',
+            'reviewComment' => 'required|string|min:10|max:1000',
+        ]);
+        
+        $eligibleBooking = $this->eligibleBooking;
+        
+        if (!$eligibleBooking) {
+            return;
+        }
+        
+        Review::create([
+            'user_id' => auth()->id(),
+            'vehicle_id' => $this->vehicle->id,
+            'booking_id' => $eligibleBooking->id,
+            'rating' => $this->reviewRating,
+            'title' => $this->reviewTitle,
+            'comment' => $this->reviewComment,
+            'is_approved' => false,
+        ]);
+        
+        // Reset form
+        $this->reset(['showReviewForm', 'reviewRating', 'reviewTitle', 'reviewComment']);
+        $this->reviewRating = 5;
+        
+        session()->flash('review_success', 'Thank you for your review! It will be visible after moderation.');
     }
 
     public function getTitle(): string
@@ -153,14 +266,23 @@ new #[Layout('components.layouts.guest')] class extends Component
                     {{ $vehicle->make }} {{ $vehicle->model }}
                 </h1>
                 <div class="flex items-center gap-2">
-                    <div class="flex text-[#FF6B35]">
-                        <span class="material-symbols-outlined text-[20px]">star</span>
-                        <span class="material-symbols-outlined text-[20px]">star</span>
-                        <span class="material-symbols-outlined text-[20px]">star</span>
-                        <span class="material-symbols-outlined text-[20px]">star</span>
-                        <span class="material-symbols-outlined text-[20px]">star_half</span>
-                    </div>
-                    <span class="text-gray-900 text-sm font-medium">4.8 (124 reviews)</span>
+                    @if($this->reviewCount > 0)
+                        <div class="flex text-[#FF6B35]">
+                            @php $fullStars = floor($this->averageRating); $hasHalf = ($this->averageRating - $fullStars) >= 0.5; @endphp
+                            @for($i = 0; $i < $fullStars; $i++)
+                                <span class="material-symbols-outlined text-[20px]">star</span>
+                            @endfor
+                            @if($hasHalf)
+                                <span class="material-symbols-outlined text-[20px]">star_half</span>
+                            @endif
+                            @for($i = $fullStars + ($hasHalf ? 1 : 0); $i < 5; $i++)
+                                <span class="material-symbols-outlined text-[20px] text-gray-300">star</span>
+                            @endfor
+                        </div>
+                        <span class="text-gray-900 text-sm font-medium">{{ $this->averageRating }} ({{ $this->reviewCount }} {{ Str::plural('review', $this->reviewCount) }})</span>
+                    @else
+                        <span class="text-gray-500 text-sm">No reviews yet</span>
+                    @endif
                     <span class="text-gray-400 text-sm">•</span>
                     <span class="text-gray-500 text-sm">{{ $vehicle->year }}</span>
                 </div>
@@ -314,60 +436,159 @@ new #[Layout('components.layouts.guest')] class extends Component
 
                 <!-- Ratings & Reviews -->
                 <div class="flex flex-col gap-6">
-                    <h3 class="text-xl font-bold text-gray-900">Ratings & Reviews</h3>
-                    <div class="flex flex-wrap gap-x-8 gap-y-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <p class="text-gray-900 text-5xl font-black leading-tight tracking-[-0.033em]">4.8</p>
-                            <div class="flex gap-0.5 text-[#FF6B35]">
-                                <span class="material-symbols-outlined">star</span>
-                                <span class="material-symbols-outlined">star</span>
-                                <span class="material-symbols-outlined">star</span>
-                                <span class="material-symbols-outlined">star</span>
-                                <span class="material-symbols-outlined">star_half</span>
-                            </div>
-                            <p class="text-gray-500 text-sm font-normal leading-normal">Based on 124 reviews</p>
-                        </div>
-                        <div class="grid min-w-[200px] max-w-[400px] flex-1 grid-cols-[20px_1fr_40px] items-center gap-y-3">
-                            <p class="text-gray-900 text-sm font-medium">5</p>
-                            <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200"><div class="rounded-full bg-[#FF6B35]" style="width: 80%;"></div></div>
-                            <p class="text-gray-500 text-sm font-normal text-right">80%</p>
-                            <p class="text-gray-900 text-sm font-medium">4</p>
-                            <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200"><div class="rounded-full bg-[#FF6B35]" style="width: 12%;"></div></div>
-                            <p class="text-gray-500 text-sm font-normal text-right">12%</p>
-                            <p class="text-gray-900 text-sm font-medium">3</p>
-                            <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200"><div class="rounded-full bg-[#FF6B35]" style="width: 5%;"></div></div>
-                            <p class="text-gray-500 text-sm font-normal text-right">5%</p>
-                            <p class="text-gray-900 text-sm font-medium">2</p>
-                            <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200"><div class="rounded-full bg-[#FF6B35]" style="width: 1%;"></div></div>
-                            <p class="text-gray-500 text-sm font-normal text-right">1%</p>
-                            <p class="text-gray-900 text-sm font-medium">1</p>
-                            <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200"><div class="rounded-full bg-[#FF6B35]" style="width: 2%;"></div></div>
-                            <p class="text-gray-500 text-sm font-normal text-right">2%</p>
-                        </div>
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-900">Ratings & Reviews</h3>
+                        @if($this->canLeaveReview)
+                            <button
+                                wire:click="toggleReviewForm"
+                                class="flex items-center gap-2 px-4 py-2 bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-bold rounded-lg transition-colors"
+                            >
+                                <span class="material-symbols-outlined text-[18px]">rate_review</span>
+                                Write a Review
+                            </button>
+                        @endif
                     </div>
 
-                    <!-- Sample Review -->
-                    <div class="flex flex-col gap-3 py-4 border-b border-gray-100">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-[#1E3A5F] h-10 w-10 rounded-full flex items-center justify-center text-white font-bold">JD</div>
-                                <div>
-                                    <p class="font-bold text-gray-900 text-sm">John Doe</p>
-                                    <p class="text-xs text-gray-500">Oct 12, 2023</p>
+                    @if(session('review_success'))
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-green-700 text-sm flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                {{ session('review_success') }}
+                            </p>
+                        </div>
+                    @endif
+
+                    <!-- Review Form -->
+                    @if($showReviewForm)
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <form wire:submit.prevent="submitReview" class="flex flex-col gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-gray-700">Your Rating</label>
+                                    <div class="flex gap-1">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <button
+                                                type="button"
+                                                wire:click="$set('reviewRating', {{ $i }})"
+                                                class="text-2xl transition-colors {{ $reviewRating >= $i ? 'text-[#FF6B35]' : 'text-gray-300 hover:text-gray-400' }}"
+                                            >
+                                                <span class="material-symbols-outlined text-[28px]">star</span>
+                                            </button>
+                                        @endfor
+                                    </div>
+                                    @error('reviewRating') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-gray-700">Title</label>
+                                    <input
+                                        type="text"
+                                        wire:model="reviewTitle"
+                                        placeholder="Summarize your experience"
+                                        class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#FF6B35] focus:border-[#FF6B35]"
+                                    >
+                                    @error('reviewTitle') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-bold text-gray-700">Your Review</label>
+                                    <textarea
+                                        wire:model="reviewComment"
+                                        rows="4"
+                                        placeholder="Tell others about your experience with this vehicle..."
+                                        class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#FF6B35] focus:border-[#FF6B35] resize-none"
+                                    ></textarea>
+                                    @error('reviewComment') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="flex gap-3 justify-end">
+                                    <button
+                                        type="button"
+                                        wire:click="toggleReviewForm"
+                                        class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        class="px-6 py-2 bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-bold rounded-lg transition-colors"
+                                    >
+                                        Submit Review
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+
+                    @if($this->reviewCount > 0)
+                        <!-- Rating Summary -->
+                        <div class="flex flex-wrap gap-x-8 gap-y-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                            <div class="flex flex-col gap-2">
+                                <p class="text-gray-900 text-5xl font-black leading-tight tracking-[-0.033em]">{{ $this->averageRating }}</p>
+                                <div class="flex gap-0.5 text-[#FF6B35]">
+                                    @php $fullStars = floor($this->averageRating); $hasHalf = ($this->averageRating - $fullStars) >= 0.5; @endphp
+                                    @for($i = 0; $i < $fullStars; $i++)
+                                        <span class="material-symbols-outlined">star</span>
+                                    @endfor
+                                    @if($hasHalf)
+                                        <span class="material-symbols-outlined">star_half</span>
+                                    @endif
+                                    @for($i = $fullStars + ($hasHalf ? 1 : 0); $i < 5; $i++)
+                                        <span class="material-symbols-outlined text-gray-300">star</span>
+                                    @endfor
+                                </div>
+                                <p class="text-gray-500 text-sm font-normal leading-normal">Based on {{ $this->reviewCount }} {{ Str::plural('review', $this->reviewCount) }}</p>
                             </div>
-                            <div class="flex text-[#FF6B35] text-sm">
-                                <span class="material-symbols-outlined text-[16px]">star</span>
-                                <span class="material-symbols-outlined text-[16px]">star</span>
-                                <span class="material-symbols-outlined text-[16px]">star</span>
-                                <span class="material-symbols-outlined text-[16px]">star</span>
-                                <span class="material-symbols-outlined text-[16px]">star</span>
+                            <div class="grid min-w-[200px] max-w-[400px] flex-1 grid-cols-[20px_1fr_40px] items-center gap-y-3">
+                                @foreach($this->ratingDistribution as $rating => $percentage)
+                                    <p class="text-gray-900 text-sm font-medium">{{ $rating }}</p>
+                                    <div class="flex h-2 flex-1 overflow-hidden rounded-full bg-gray-200">
+                                        <div class="rounded-full bg-[#FF6B35]" style="width: {{ $percentage }}%;"></div>
+                                    </div>
+                                    <p class="text-gray-500 text-sm font-normal text-right">{{ $percentage }}%</p>
+                                @endforeach
                             </div>
                         </div>
-                        <p class="text-gray-700 text-sm leading-relaxed">
-                            "The car was in pristine condition. The drive was smooth, and the tech features were amazing. Highly recommend for anyone looking for a premium experience."
-                        </p>
-                    </div>
+
+                        <!-- Reviews List -->
+                        <div class="flex flex-col">
+                            @foreach($this->reviews as $review)
+                                <div class="flex flex-col gap-3 py-4 border-b border-gray-100">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex items-center gap-3">
+                                            <div class="bg-[#1E3A5F] h-10 w-10 rounded-full flex items-center justify-center text-white font-bold">
+                                                {{ strtoupper(substr($review->user->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $review->user->name)[1] ?? '', 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-900 text-sm">{{ $review->user->name }}</p>
+                                                <p class="text-xs text-gray-500">{{ $review->created_at->format('M d, Y') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex text-[#FF6B35] text-sm">
+                                            @for($i = 0; $i < $review->rating; $i++)
+                                                <span class="material-symbols-outlined text-[16px]">star</span>
+                                            @endfor
+                                            @for($i = $review->rating; $i < 5; $i++)
+                                                <span class="material-symbols-outlined text-[16px] text-gray-300">star</span>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    @if($review->title)
+                                        <p class="font-semibold text-gray-900 text-sm">{{ $review->title }}</p>
+                                    @endif
+                                    <p class="text-gray-700 text-sm leading-relaxed">{{ $review->comment }}</p>
+                                    @if($review->admin_response)
+                                        <div class="ml-8 p-3 bg-gray-50 rounded-lg border-l-2 border-[#FF6B35]">
+                                            <p class="text-xs font-bold text-gray-500 mb-1">Response from CARTAR</p>
+                                            <p class="text-gray-700 text-sm">{{ $review->admin_response }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="bg-gray-50 p-8 rounded-xl text-center">
+                            <span class="material-symbols-outlined text-gray-400 text-5xl mb-3">rate_review</span>
+                            <p class="text-gray-700 font-medium">No reviews yet</p>
+                            <p class="text-gray-500 text-sm mt-1">Be the first to share your experience with this vehicle.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
 

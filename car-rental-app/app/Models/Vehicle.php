@@ -92,4 +92,28 @@ class Vehicle extends Model
         }
         return number_format($this->mileage) . ' km/day';
     }
+
+    /**
+     * Get the vehicle's reviews
+     */
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the average rating
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->reviews()->approved()->avg('rating') ?? 0, 1);
+    }
+
+    /**
+     * Get the review count
+     */
+    public function getReviewCountAttribute(): int
+    {
+        return $this->reviews()->approved()->count();
+    }
 }

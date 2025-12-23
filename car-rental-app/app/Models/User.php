@@ -100,4 +100,12 @@ class User extends Authenticatable
             ? \Illuminate\Support\Facades\Storage::url($this->profile_photo_path)
             : null;
     }
+
+    /**
+     * Get the user's reviews
+     */
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
 }

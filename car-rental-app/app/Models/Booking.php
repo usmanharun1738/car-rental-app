@@ -41,4 +41,9 @@ class Booking extends Model
     {
         return $this->morphMany(Payment::class, 'payable');
     }
+
+    public function review(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
 }
