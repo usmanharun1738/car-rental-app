@@ -30,6 +30,17 @@ class VehicleImage extends Model
      */
     public function getUrlAttribute(): string
     {
+        // If path starts with 'http' it's already a full URL
+        if (str_starts_with($this->path, 'http')) {
+            return $this->path;
+        }
+        
+        // For images in storage (uploaded via Filament)
+        if (str_starts_with($this->path, 'vehicle-images/') && file_exists(storage_path('app/public/' . $this->path))) {
+            return asset('storage/' . $this->path);
+        }
+        
+        // For images directly in public folder (seeded images)
         return asset($this->path);
     }
 }

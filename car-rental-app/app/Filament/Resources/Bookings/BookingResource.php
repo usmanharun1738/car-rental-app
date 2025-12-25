@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Bookings;
 
-use App\Filament\Resources\Bookings\Pages\CreateBooking;
 use App\Filament\Resources\Bookings\Pages\EditBooking;
 use App\Filament\Resources\Bookings\Pages\ListBookings;
 use App\Filament\Resources\Bookings\Pages\ViewBooking;
@@ -25,6 +24,11 @@ class BookingResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'Booking';
+
+    public static function canCreate(): bool
+    {
+        return false; // Bookings are created through frontend booking flow
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -52,7 +56,6 @@ class BookingResource extends Resource
     {
         return [
             'index' => ListBookings::route('/'),
-            'create' => CreateBooking::route('/create'),
             'view' => ViewBooking::route('/{record}'),
             'edit' => EditBooking::route('/{record}/edit'),
         ];

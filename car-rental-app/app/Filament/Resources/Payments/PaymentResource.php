@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Payments;
 
-use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Resources\Payments\Pages\ViewPayment;
@@ -24,6 +23,11 @@ class PaymentResource extends Resource
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'Payment';
+
+    public static function canCreate(): bool
+    {
+        return false; // Payments are created through payment gateway
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -83,7 +87,6 @@ class PaymentResource extends Resource
     {
         return [
             'index' => ListPayments::route('/'),
-            'create' => CreatePayment::route('/create'),
             'view' => ViewPayment::route('/{record}'),
             'edit' => EditPayment::route('/{record}/edit'),
         ];
@@ -99,3 +102,4 @@ class PaymentResource extends Resource
         return static::getModel()::where('status', \App\Enums\PaymentStatus::FAILED)->count() > 0 ? 'danger' : 'success';
     }
 }
+

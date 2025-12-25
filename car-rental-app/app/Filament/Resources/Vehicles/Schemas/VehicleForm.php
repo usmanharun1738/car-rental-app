@@ -9,6 +9,8 @@ use App\Models\Feature;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -76,7 +78,7 @@ class VehicleForm
                             ->helperText('Enter 0 for unlimited mileage'),
                     ]),
 
-                Section::make('Features & Media')
+                Section::make('Features')
                     ->schema([
                         Select::make('features')
                             ->relationship('features', 'name')
@@ -90,9 +92,37 @@ class VehicleForm
                                     ->placeholder('e.g., Apple CarPlay'),
                             ])
                             ->helperText('Select existing features or create new ones'),
-                        FileUpload::make('image_url')
-                            ->image()
-                            ->directory('vehicles')
+                    ]),
+
+                Section::make('Vehicle Images')
+                    ->description('Upload multiple images. The first image or one marked as primary will be shown on listings.')
+                    ->schema([
+                        Repeater::make('images')
+                            ->relationship()
+                            ->schema([
+                                FileUpload::make('path')
+                                    ->label('Image')
+                                    ->image()
+                                    ->directory('vehicle-images')
+                                    ->disk('public')
+                                    ->required()
+                                    ->imageEditor()
+                                    ->columnSpan(2),
+                                TextInput::make('alt_text')
+                                    ->label('Alt Text')
+                                    ->placeholder('e.g., Front view')
+                                    ->maxLength(255),
+                                Toggle::make('is_primary')
+                                    ->label('Primary Image')
+                                    ->helperText('Show as main image'),
+                            ])
+                            ->columns(3)
+                            ->reorderable()
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['alt_text'] ?? 'Image')
+                            ->addActionLabel('Add Image')
+                            ->defaultItems(0)
                             ->columnSpanFull(),
                     ]),
             ]);
