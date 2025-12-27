@@ -43,41 +43,104 @@ new #[Layout('components.layouts.guest')] #[Title('CARTAR - Premium Car Rentals'
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="py-16 px-4 md:px-10 bg-white">
-        <div class="max-w-[1200px] mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-gray-900 text-3xl font-bold leading-tight mb-3">How it works</h2>
-                <p class="text-gray-500 text-base">Simple and fast. Get on the road in minutes.</p>
+    <!-- How It Works - Glassmorphism Design -->
+    <section class="py-20 px-4 md:px-10 bg-gradient-to-br from-[#1E3A5F] via-[#2a4a73] to-[#1E3A5F] relative overflow-hidden">
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-[#FF6B35]/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-[#FF6B35]/10 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="max-w-[1200px] mx-auto relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-[#FF6B35] text-sm font-semibold mb-4 border border-white/20">
+                    Simple Process
+                </span>
+                <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-4">How it works</h2>
+                <p class="text-white/70 text-lg max-w-xl mx-auto">Get on the road in just 3 simple steps. Fast, easy, and hassle-free.</p>
             </div>
+            
+            <!-- Steps Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Step 1 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">calendar_add_on</span>
+                <div class="group relative animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="relative p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF6B35]/20">
+                        <!-- Step Number -->
+                        <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[#FF6B35]/40 group-hover:scale-110 transition-transform duration-300">
+                            01
+                        </div>
+                        
+                        <!-- Icon -->
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center mb-6 mx-auto shadow-lg shadow-[#FF6B35]/30 group-hover:shadow-[#FF6B35]/50 transition-all duration-300 group-hover:scale-105">
+                            <span class="material-symbols-outlined text-white text-4xl group-hover:animate-pulse">calendar_add_on</span>
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-xl font-bold text-white mb-3 text-center">Book Your Car</h3>
+                        <p class="text-white/60 text-sm text-center leading-relaxed">Choose your perfect car and book it online instantly with our secure platform.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Book your car</h3>
-                    <p class="text-gray-500 text-sm">Choose your perfect car and book it online instantly with our secure platform.</p>
                 </div>
+                
                 <!-- Step 2 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">car_rental</span>
+                <div class="group relative animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="relative p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF6B35]/20">
+                        <!-- Step Number -->
+                        <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[#FF6B35]/40 group-hover:scale-110 transition-transform duration-300">
+                            02
+                        </div>
+                        
+                        <!-- Icon -->
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center mb-6 mx-auto shadow-lg shadow-[#FF6B35]/30 group-hover:shadow-[#FF6B35]/50 transition-all duration-300 group-hover:scale-105">
+                            <span class="material-symbols-outlined text-white text-4xl group-hover:animate-pulse">car_rental</span>
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-xl font-bold text-white mb-3 text-center">Pick Up</h3>
+                        <p class="text-white/60 text-sm text-center leading-relaxed">Pick up your car at one of our many locations or get it delivered to you.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Pick up</h3>
-                    <p class="text-gray-500 text-sm">Pick up your car at one of our many locations or get it delivered to you.</p>
                 </div>
+                
                 <!-- Step 3 -->
-                <div class="flex flex-col items-center text-center p-6 rounded-xl bg-gray-50">
-                    <div class="size-16 rounded-full bg-[#FF6B35]/20 flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined text-[#FF6B35] text-3xl">directions_car</span>
+                <div class="group relative animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="relative p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#FF6B35]/20">
+                        <!-- Step Number -->
+                        <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[#FF6B35]/40 group-hover:scale-110 transition-transform duration-300">
+                            03
+                        </div>
+                        
+                        <!-- Icon -->
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff8c5a] flex items-center justify-center mb-6 mx-auto shadow-lg shadow-[#FF6B35]/30 group-hover:shadow-[#FF6B35]/50 transition-all duration-300 group-hover:scale-105">
+                            <span class="material-symbols-outlined text-white text-4xl group-hover:animate-pulse">directions_car</span>
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-xl font-bold text-white mb-3 text-center">Drive Away</h3>
+                        <p class="text-white/60 text-sm text-center leading-relaxed">Hit the road and enjoy your trip. We've got you covered with 24/7 support.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Drive away</h3>
-                    <p class="text-gray-500 text-sm">Hit the road and enjoy your trip. We've got you covered with 24/7 support.</p>
                 </div>
             </div>
         </div>
     </section>
+    
+    <!-- Animation Styles -->
+    <style>
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
 
     <!-- Popular Vehicles with Search -->
     <section id="vehicles" class="py-16 px-4 md:px-10 bg-gray-50">

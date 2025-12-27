@@ -10,10 +10,10 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-        <!-- Fonts: Plus Jakarta Sans -->
+        <!-- Fonts: Poppins -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         
         <!-- Material Symbols -->
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                 --color-secondary-dark: #e55a2b;
             }
             body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-family: 'Poppins', sans-serif;
             }
         </style>
     </head>
@@ -175,8 +175,8 @@
                         <h3 class="text-white font-bold mb-4">Support</h3>
                         <ul class="flex flex-col gap-2">
                             <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="#">Help Center</a></li>
-                            <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="#">Terms of Service</a></li>
-                            <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="#">Privacy Policy</a></li>
+                            <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="{{ route('terms') }}">Terms of Service</a></li>
+                            <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="{{ route('privacy') }}">Privacy Policy</a></li>
                             <li><a class="text-gray-400 hover:text-[#FF6B35] text-sm transition-colors" href="#">Contact Us</a></li>
                         </ul>
                     </div>

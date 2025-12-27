@@ -8,6 +8,10 @@ use App\Http\Controllers\PaystackWebhookController;
 
 Volt::route('/', 'pages.home')->name('home');
 
+// Legal Pages
+Volt::route('/terms', 'pages.terms')->name('terms');
+Volt::route('/privacy', 'pages.privacy')->name('privacy');
+
 // Payment callback (no auth required - Paystack redirects here)
 Route::get('/payment/callback', [PaymentCallbackController::class, 'handle'])->name('payment.callback');
 

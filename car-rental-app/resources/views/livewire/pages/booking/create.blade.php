@@ -319,7 +319,7 @@ new #[Layout('components.layouts.guest')] #[Title('Finalize Your Booking - CARTA
                             <input wire:model="agreedToTerms" type="checkbox" id="terms" 
                                 class="w-5 h-5 rounded border-gray-300 text-[#E3655B] focus:ring-[#E3655B] cursor-pointer">
                             <label class="text-sm text-gray-600 cursor-pointer" for="terms">
-                                I agree to the <a class="text-[#E3655B] hover:underline" href="#">Terms of Service</a> and <a class="text-[#E3655B] hover:underline" href="#">Privacy Policy</a>.
+                                I agree to the <a class="text-[#E3655B] hover:underline" href="{{ route('terms') }}" target="_blank">Terms of Service</a> and <a class="text-[#E3655B] hover:underline" href="{{ route('privacy') }}" target="_blank">Privacy Policy</a>.
                             </label>
                         </div>
                         @error('agreedToTerms') <p class="text-red-500 text-xs mb-4">{{ $message }}</p> @enderror
