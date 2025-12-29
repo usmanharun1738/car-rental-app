@@ -8,6 +8,8 @@ use Carbon\Carbon;
 
 new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] class extends Component
 {
+    public int $currentRentalIndex = 0;
+
     #[Computed]
     public function bookings()
     {
@@ -23,17 +25,62 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
         $bookings = $this->bookings;
         $totalSpent = $bookings->where('status', BookingStatus::COMPLETED)->sum('total_price');
         
+        // Count only non-expired active rentals
+        $activeRentals = $bookings
+            ->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])
+            ->filter(fn($booking) => $booking->end_time->isFuture())
+            ->count();
+        
         return [
             'totalSpent' => $totalSpent,
-            'activeRentals' => $bookings->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])->count(),
+            'activeRentals' => $activeRentals,
             'rewardPoints' => (int) ($totalSpent / 1000) * 10,
         ];
     }
 
     #[Computed]
-    public function activeBooking()
+    public function activeBookings()
     {
-        return $this->bookings->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])->first();
+        return $this->bookings
+            ->whereIn('status', [BookingStatus::CONFIRMED, BookingStatus::ACTIVE])
+            ->filter(fn($booking) => $booking->end_time->isFuture())
+            ->values();
+    }
+
+    #[Computed]
+    public function currentActiveBooking()
+    {
+        $bookings = $this->activeBookings;
+        if ($bookings->isEmpty()) {
+            return null;
+        }
+        // Ensure index is within bounds
+        $this->currentRentalIndex = min($this->currentRentalIndex, $bookings->count() - 1);
+        return $bookings[$this->currentRentalIndex] ?? $bookings->first();
+    }
+
+    public function nextRental(): void
+    {
+        $count = $this->activeBookings->count();
+        if ($count > 1) {
+            $this->currentRentalIndex = ($this->currentRentalIndex + 1) % $count;
+        }
+    }
+
+    public function previousRental(): void
+    {
+        $count = $this->activeBookings->count();
+        if ($count > 1) {
+            $this->currentRentalIndex = ($this->currentRentalIndex - 1 + $count) % $count;
+        }
+    }
+
+    public function goToRental(int $index): void
+    {
+        $count = $this->activeBookings->count();
+        if ($index >= 0 && $index < $count) {
+            $this->currentRentalIndex = $index;
+        }
     }
 
     #[Computed]
@@ -53,6 +100,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
         };
     }
 }; ?>
+
 
 <div class="max-w-5xl mx-auto flex flex-col gap-8">
     <!-- Welcome Section -->
@@ -83,9 +131,9 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
                 <p class="text-slate-500 text-sm font-medium mb-1">Active Rentals</p>
                 <h3 class="text-2xl font-bold text-[#111418]">{{ $this->stats['activeRentals'] }} {{ Str::plural('Car', $this->stats['activeRentals']) }}</h3>
             </div>
-            @if($this->activeBooking)
+            @if($this->currentActiveBooking)
                 <div class="text-[#E3655B] text-xs font-medium">
-                    Ends {{ $this->activeBooking->end_time->diffForHumans() }}
+                    Ends {{ $this->currentActiveBooking->end_time->diffForHumans() }}
                 </div>
             @else
                 <div class="text-slate-400 text-xs font-medium">No active rentals</div>
@@ -109,20 +157,42 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column: Active Rental & Booking History -->
         <div class="lg:col-span-2 flex flex-col gap-8">
-            <!-- Active Rental Card -->
-            @if($this->activeBooking)
+            <!-- Active Rental Card with Carousel -->
+            @if($this->currentActiveBooking)
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-white">
-                        <h3 class="font-bold text-lg text-[#111418]">Current Rental</h3>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#9CBF9B]/20 text-[#2C5E2E] border border-[#9CBF9B]/30 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#2C5E2E]"></span> Active
-                        </span>
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-bold text-lg text-[#111418]">Current Rental</h3>
+                            @if($this->activeBookings->count() > 1)
+                                <span class="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                                    {{ $currentRentalIndex + 1 }} of {{ $this->activeBookings->count() }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <!-- Carousel Navigation Arrows -->
+                            @if($this->activeBookings->count() > 1)
+                                <div class="flex items-center gap-1">
+                                    <button wire:click="previousRental" 
+                                            class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                                        <span class="material-symbols-outlined text-sm text-slate-600">chevron_left</span>
+                                    </button>
+                                    <button wire:click="nextRental" 
+                                            class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                                        <span class="material-symbols-outlined text-sm text-slate-600">chevron_right</span>
+                                    </button>
+                                </div>
+                            @endif
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#9CBF9B]/20 text-[#2C5E2E] border border-[#9CBF9B]/30 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#2C5E2E]"></span> Active
+                            </span>
+                        </div>
                     </div>
                     <div class="p-5 flex flex-col sm:flex-row gap-6">
                         <div class="w-full sm:w-1/3 aspect-video bg-gray-100 rounded-lg overflow-hidden border border-slate-100 shadow-inner">
-                            @if($this->activeBooking->vehicle?->primary_image_url)
-                                <img src="{{ $this->activeBooking->vehicle->primary_image_url }}" 
-                                     alt="{{ $this->activeBooking->vehicle->make }}"
+                            @if($this->currentActiveBooking->vehicle?->primary_image_url)
+                                <img src="{{ $this->currentActiveBooking->vehicle->primary_image_url }}" 
+                                     alt="{{ $this->currentActiveBooking->vehicle->make }}"
                                      class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400">
@@ -135,29 +205,29 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
                                         <h4 class="text-xl font-bold text-[#111418]">
-                                            {{ $this->activeBooking->vehicle?->make }} {{ $this->activeBooking->vehicle?->model }} {{ $this->activeBooking->vehicle?->year }}
+                                            {{ $this->currentActiveBooking->vehicle?->make }} {{ $this->currentActiveBooking->vehicle?->model }} {{ $this->currentActiveBooking->vehicle?->year }}
                                         </h4>
                                         <p class="text-slate-500 text-sm">
-                                            {{ $this->activeBooking->vehicle?->transmission?->label() ?? 'Auto' }} • {{ $this->activeBooking->vehicle?->seats ?? 5 }} Seats
+                                            {{ $this->currentActiveBooking->vehicle?->transmission?->label() ?? 'Auto' }} • {{ $this->currentActiveBooking->vehicle?->seats ?? 5 }} Seats
                                         </p>
                                     </div>
-                                    <p class="font-bold text-[#111418]">₦{{ number_format($this->activeBooking->vehicle?->daily_rate) }}<span class="text-slate-400 text-xs font-normal">/day</span></p>
+                                    <p class="font-bold text-[#111418]">₦{{ number_format($this->currentActiveBooking->vehicle?->daily_rate) }}<span class="text-slate-400 text-xs font-normal">/day</span></p>
                                 </div>
                                 <div class="flex gap-4 mt-4 mb-4">
                                     <div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
                                         <p class="text-xs text-slate-400 font-medium uppercase">Pick-up</p>
-                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->activeBooking->vehicle?->location ?? 'Lagos' }}</p>
-                                        <p class="text-xs text-slate-500 mt-1">{{ $this->activeBooking->start_time->format('M d, h:i A') }}</p>
+                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->currentActiveBooking->vehicle?->location ?? 'Lagos' }}</p>
+                                        <p class="text-xs text-slate-500 mt-1">{{ $this->currentActiveBooking->start_time->format('M d, h:i A') }}</p>
                                     </div>
                                     <div class="bg-slate-50 p-3 rounded-lg flex-1 border border-slate-100">
                                         <p class="text-xs text-slate-400 font-medium uppercase">Drop-off</p>
-                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->activeBooking->vehicle?->location ?? 'Lagos' }}</p>
-                                        <p class="text-xs text-slate-500 mt-1">{{ $this->activeBooking->end_time->format('M d, h:i A') }}</p>
+                                        <p class="text-sm font-semibold text-[#111418] mt-1">{{ $this->currentActiveBooking->vehicle?->location ?? 'Lagos' }}</p>
+                                        <p class="text-xs text-slate-500 mt-1">{{ $this->currentActiveBooking->end_time->format('M d, h:i A') }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex gap-3 mt-2">
-                                <a href="{{ route('booking.success', $this->activeBooking) }}" 
+                                <a href="{{ route('booking.success', $this->currentActiveBooking) }}" 
                                    class="flex-1 bg-[#111418] text-white text-sm font-bold py-2.5 rounded-lg hover:bg-slate-800 transition-colors text-center"
                                    wire:navigate>
                                     View Details
@@ -165,6 +235,16 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
                             </div>
                         </div>
                     </div>
+                    <!-- Carousel Dots -->
+                    @if($this->activeBookings->count() > 1)
+                        <div class="flex items-center justify-center gap-2 pb-4">
+                            @foreach($this->activeBookings as $index => $booking)
+                                <button wire:click="goToRental({{ $index }})" 
+                                        class="w-2 h-2 rounded-full transition-all {{ $currentRentalIndex === $index ? 'bg-[#E3655B] w-4' : 'bg-slate-300 hover:bg-slate-400' }}">
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @endif
 
