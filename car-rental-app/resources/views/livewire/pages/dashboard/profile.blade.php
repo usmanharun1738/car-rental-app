@@ -33,9 +33,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
     #[Validate('nullable|image|max:2048')]
     public $photo = null;
 
-    public bool $bookingNotifications = true;
-    public bool $marketingOffers = false;
-    public bool $smsAlerts = true;
+
 
     public function mount(): void
     {
@@ -168,36 +166,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
                 </div>
             </div>
 
-            <!-- Profile Completion -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="font-bold text-[#111418] text-sm">Profile Completion</h4>
-                    <span class="text-[#E3655B] font-bold text-sm">{{ $this->getProfileCompletion() }}%</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-2 mb-4">
-                    <div class="bg-[#E3655B] h-2 rounded-full transition-all" style="width: {{ $this->getProfileCompletion() }}%"></div>
-                </div>
-                <ul class="space-y-3">
-                    <li class="flex items-center gap-3 text-sm {{ auth()->user()->email_verified_at ? 'text-slate-500 line-through decoration-slate-400' : 'text-[#111418] font-medium' }}">
-                        <span class="material-symbols-outlined text-[18px] {{ auth()->user()->email_verified_at ? 'text-[#9CBF9B]' : 'text-slate-300' }}">
-                            {{ auth()->user()->email_verified_at ? 'check_circle' : 'radio_button_unchecked' }}
-                        </span>
-                        Verify Email
-                    </li>
-                    <li class="flex items-center gap-3 text-sm {{ auth()->user()->phone ? 'text-slate-500 line-through decoration-slate-400' : 'text-[#111418] font-medium' }}">
-                        <span class="material-symbols-outlined text-[18px] {{ auth()->user()->phone ? 'text-[#9CBF9B]' : 'text-slate-300' }}">
-                            {{ auth()->user()->phone ? 'check_circle' : 'radio_button_unchecked' }}
-                        </span>
-                        Add Phone Number
-                    </li>
-                    <li class="flex items-center gap-3 text-sm {{ auth()->user()->bookings()->exists() ? 'text-slate-500 line-through decoration-slate-400' : 'text-[#111418] font-medium' }}">
-                        <span class="material-symbols-outlined text-[18px] {{ auth()->user()->bookings()->exists() ? 'text-[#9CBF9B]' : 'text-slate-300' }}">
-                            {{ auth()->user()->bookings()->exists() ? 'check_circle' : 'radio_button_unchecked' }}
-                        </span>
-                        Complete First Booking
-                    </li>
-                </ul>
-            </div>
+
 
             <!-- Need Help -->
             <div class="bg-[#CFD186]/20 rounded-xl border border-[#CFD186]/30 p-6 flex flex-col gap-3">
@@ -266,44 +235,7 @@ new #[Layout('components.layouts.dashboard')] #[Title('User Profile - CARTAR')] 
                 </div>
             </section>
 
-            <!-- Communication Preferences -->
-            <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-white">
-                    <h3 class="font-bold text-lg text-[#111418]">Communication Preferences</h3>
-                </div>
-                <div class="p-6 flex flex-col gap-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-bold text-[#111418]">Booking Notifications</h4>
-                            <p class="text-xs text-slate-500">Receive updates about your car rental status via email.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model.live="bookingNotifications" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#9CBF9B]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9CBF9B]"></div>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-bold text-[#111418]">Marketing & Offers</h4>
-                            <p class="text-xs text-slate-500">Get notified about discounts and special promos.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model.live="marketingOffers" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#9CBF9B]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9CBF9B]"></div>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-bold text-[#111418]">SMS Alerts</h4>
-                            <p class="text-xs text-slate-500">Receive urgent updates on your phone.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model.live="smsAlerts" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#9CBF9B]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9CBF9B]"></div>
-                        </label>
-                    </div>
-                </div>
-            </section>
+
         </div>
     </div>
 </div>

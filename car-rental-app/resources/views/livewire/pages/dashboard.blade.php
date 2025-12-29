@@ -306,47 +306,6 @@ new #[Layout('components.layouts.dashboard')] #[Title('Dashboard - CARTAR')] cla
 
         <!-- Right Column: Quick Links & Profile -->
         <div class="lg:col-span-1 flex flex-col gap-8">
-            <!-- Profile Completion -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                <h4 class="font-bold text-[#111418] mb-4">Complete your profile</h4>
-                <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="size-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined text-sm">check</span>
-                        </div>
-                        <p class="text-sm text-slate-600 line-through decoration-slate-400">Verify Email Address</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="size-6 rounded-full {{ auth()->user()->phone ? 'bg-green-100 text-green-600' : 'border border-dashed border-slate-300 text-slate-400' }} flex items-center justify-center shrink-0">
-                            @if(auth()->user()->phone)
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            @endif
-                        </div>
-                        <p class="text-sm {{ auth()->user()->phone ? 'text-slate-600 line-through decoration-slate-400' : 'text-[#111418] font-medium' }}">Add Phone Number</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="size-6 rounded-full border border-dashed border-slate-300 text-slate-400 flex items-center justify-center shrink-0">
-                        </div>
-                        <p class="text-sm text-[#111418] font-medium">Complete First Booking</p>
-                    </div>
-                    <a href="{{ route('dashboard.profile') }}" 
-                       class="mt-2 w-full py-2 border border-slate-200 rounded-lg text-sm font-bold text-[#111418] hover:bg-slate-50 transition-colors text-center"
-                       wire:navigate>
-                        Update Profile
-                    </a>
-                </div>
-            </div>
-
-            <!-- Promotion Card -->
-            <div class="bg-[#CFD186]/20 rounded-xl border border-[#CFD186]/30 p-6 flex flex-col items-center text-center">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm">
-                    <span class="material-symbols-outlined text-[#E3655B] text-3xl">celebration</span>
-                </div>
-                <h4 class="font-bold text-[#111418] mb-1">Invite Friends</h4>
-                <p class="text-sm text-slate-600 mb-4">Earn ₦5,000 credit for every friend who rents a car.</p>
-                <button class="text-[#E3655B] text-sm font-bold hover:underline">Copy Invite Link</button>
-            </div>
-
             <!-- Need Help -->
             <div class="bg-[#101922] rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
                 <div class="absolute right-0 bottom-0 w-32 h-32 bg-[#E3655B] rounded-full opacity-10 blur-2xl translate-x-10 translate-y-10"></div>
